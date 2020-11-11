@@ -1,0 +1,24 @@
+{
+	"name": "Pledge",
+	"version": "1.0.0",
+	"engines": {
+		"node": "12.14.x"
+	},
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"start": "node index.js"
+	},
+	"author": "Charles Barry",
+	"dependencies": {
+		"atob": "^2.1.2",
+		"bcrypt": "^4.0.1",
+		"bcrypt-promise": "^2.0.0",
+		"koa": "^2.11.0",
+		"koa-body": "^4.1.1",
+		"koa-router": "^8.0.8",
+		"koa-send": "^5.0.0",
+		"koa-static": "^5.0.0",
+		"sqlite-async": "^1.0.12"
+	}
+}
