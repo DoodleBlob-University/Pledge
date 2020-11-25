@@ -4,19 +4,38 @@
     <head>
         <title>Pledge</title>
         <link rel="stylesheet" href="style.css">
+        <link rel="icon" type="image/png" href="assets/images/PledgeLogo.png" />
         <script type="module" src="main.js"></script>
     </head>
     
     <body>
         <header>
-            <h1>Pledge App</h1>
-        </header>
+        <div class="nav">
+            <a href="#" style="padding:7px 0px 0px 100px;">
+                <img src="assets/images/PledgeLogo.png" class="logo">
+            </a>
+            <a href="#">Pledge</a>
+            
+            <div class="profilelogin">
+                <div class="dropdown" style="float:right; padding-right:10%;">
+                    <button class="dropbtn">Profile
+                        <i class="fas fa-camera"></i>
+                    </button>
+                    <div class="dropdown-content">
+                      <a id="accbalance" href="#">£0.00</a>
+                      <a href="#">Change Location</a>
+                      <a href="#">Log Out</a>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+		</header>
         
         <main>
         </main>
         
         <footer>
-            
         </footer>
     </body>
     
@@ -26,3 +45,4 @@
     
     
 </html>
+
