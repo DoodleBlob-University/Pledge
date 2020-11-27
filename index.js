@@ -3,6 +3,8 @@ const send = require('koa-send')
 const Router = require('koa-router')
 const koaStatic = require('koa-static')
 
+const koaBody = require('koa-body')({multipart: true, uploadDir: '.'})
+
 const app = new Koa()
 const router = new Router()
 
@@ -16,7 +18,6 @@ const port = process.env.PORT || defaultPort
 app.use(koaStatic('public'))
 
 router.get('/', async ctx => {
-	console.log('GET /')
 	try {
 		await send(ctx.path, { root: __dirname + '/public/index.html' } )
 	} catch(err) {
@@ -24,6 +25,12 @@ router.get('/', async ctx => {
 		await send(ctx.path, { root: __dirname + '/public/index.html' } )
 	}
 })
+
+/* // CTX.RENDER NOT A FUNCTION
+router.get('/login', async ctx => {
+	await ctx.render('login', ctx.hbs)
+})
+*/
 
 app.use(router.routes())
 module.exports = app.listen(port, () => console.log(`Listening on ${port}`))
