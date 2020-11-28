@@ -11,7 +11,7 @@ html, body {
 }
 
 #scrolltotop {
-    display: inline-block;
+    display: none;
     outline: none;
     cursor: pointer;
     position: fixed;
@@ -124,17 +124,12 @@ html, body {
     margin-right: 20%;
     border-radius: 5px;
     background-color: white;
+    min-width: 325px;
 }
 
 .content .text {
     font-family: Roboto;
     padding: 20px;
-}
-
-.content .text .filter {
-    font-family: Overpass;
-    font-size: 12px;
-    float: right;
 }
 
 .content .text .newpledge {
@@ -144,10 +139,19 @@ html, body {
     border: none;
     font-size: 12px;
     border-radius: 10%;
+    display: inline-block;
+
 }
 
 .content .text .newpledge:hover {
     background-color: #d4d4d4;
+}
+
+.content .text .filter {
+    font-family: Overpass;
+    font-size: 12px;
+    float: right;
+    display: inline-block;
 }
 
 .content .text .error {

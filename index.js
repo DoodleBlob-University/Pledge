@@ -12,7 +12,7 @@ const defaultPort = 8080
 const port = process.env.PORT || defaultPort
 
 //const dbName = 'website.db'
-//const User = require('./modules/user')
+//const Account = require('./modules/user')
 //const List = require('./modules/list')
 
 app.use(koaStatic('public'))

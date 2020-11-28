@@ -10,12 +10,14 @@ async function load() {
 	try {
         // page equals string after # or if none, 'home'
         const page = location.hash.length > 1 ? location.hash.substring(1) : 'home'
-        console.log(page)
+        console.log( location.host + '/' + location.hash)
         // load html and js
-        document.querySelector('main').innerHTML = await ( await fetch('./views/' + page + '.html') ).text()
+        document.querySelector('main').innerHTML = await ( await fetch('./views/' + page + '.html') ).text() // inject html into <main> of index
         const pageModule = await import('./modules/' + page + '.js')
         
         // TODO: cookies auth
+        
+        // TODO: module.setup()
 
 	} catch(err) {
 		// page doesnt exist
@@ -23,6 +25,14 @@ async function load() {
 		window.location.href = '/#404'
 	}
 }
+
+window.addEventListener('scroll', function() {
+    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+        scrolltotop.style.display = "block";
+    } else {
+        scrolltotop.style.display = "none";
+    }
+});
 
 document.getElementById("scrolltotop").addEventListener("click", ()=>{
     document.body.scrollTop = 0; // Safari
