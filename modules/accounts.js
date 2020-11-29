@@ -53,10 +53,19 @@ admin BOOLEAN NOT NULL CHECK (admin IN (0,1)));";
     }
     
     //LOGIN USER
-    async login(emailusername, password){
+    async login(encodedData){
+        var data = Buffer.from(encodedData, 'base64').toString(); // decode
+        var [ username, password ] = data.split(":"); // split into password and username
+        // check db for user
+        let sql = `SELECT username, password, admin FROM users WHERE username = '${username}';`;
+        const result = await this.db.get(sql);
+        // check if any users exist
+        if(!result) throw new Error(`${username} is not a registered user`);
+        // check if passwords match
+        const match = await bcrypt.compare(password, result.password); // encrypt
+        if(!match) throw new Error("Password is incorrect");
         
-        
-        
+        return { username: username, admin: result.admin };
     }
     
     

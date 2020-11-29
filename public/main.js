@@ -8,7 +8,7 @@ window.addEventListener('hashchange', async event => await load())
 async function load() {
     
     document.querySelector('main').style.display = "none"; // hides main html
-    document.getElementById('loading').style.display = "block";
+    document.getElementById('loading').style.display = "block"; // shows loading dots
     
 	try {
         // page equals string after # or if none, 'home'
@@ -20,6 +20,7 @@ async function load() {
         
         // TODO: cookies auth
         
+        // run js for page
         pageModule.setup()
 
 	} catch(err) {
@@ -29,10 +30,12 @@ async function load() {
 	}
     
     document.querySelector('main').style.display = "block"; // displays upon page loading    
-    document.getElementById('loading').style.display = "none";
+    document.getElementById('loading').style.display = "none"; // hides loading dots
 
 }
 
+
+/* --- scroll to top button --- */
 window.addEventListener('scroll', function() {
     if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
         scrolltotop.style.display = "block";

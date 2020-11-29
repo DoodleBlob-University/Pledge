@@ -38,7 +38,7 @@ router.post("/register", koaBody, async ctx=> {
     } catch(error) {
         // account failed to be created
         ctx.status = 422;
-        ctx.body = { status: "error", msg: error.message }
+        ctx.body = { status: "error", msg: error.message };
     
     } finally {
         acc.close();
@@ -49,10 +49,18 @@ router.get("/login", async ctx=> {
     console.log("GET: login")
     const acc = await new Account(db); // construct account class
     try{
-        
+        const header = ctx.request.headers.data;
+        const encodedData = header;
+        const loginStatus = await acc.login(encodedData);
+       
+        ctx.status = 200;
+        ctx.body = { status: "success", username: loginStatus.username, 
+                    admin: loginStatus.admin, msg: "logged in" };
         
     } catch(error) {
-        
+        console.log(error);
+        ctx.status = 401;
+        ctx.body = { status: "error", msg: error.message };
     
     } finally {
         acc.close();

@@ -1,3 +1,5 @@
+import { emptyFields } from '../assets/js/functions.js'
+
 export function setup() {       
     // wait for form submission, then run login()
     document.querySelector('form').addEventListener('submit', async event => await register(event));
@@ -17,16 +19,20 @@ async function register(event){
         if( data.password != data.passwordconf) throw "Passwords do not match";
         
         // post register data
-        const body = { method: 'post', body: JSON.stringify(data) }
-        const response = await fetch("/register", body)
+        const options = { method: 'post', body: JSON.stringify(data) }
+        const response = await fetch("/register", options)
         const json = await response.json();
         
         if( response.status === 422){
             // error in creating the account
-            throw json.msg // throw error message
-        } else {
+            throw json.msg; // throw error message
+        } else if (response.status === 201) {
+            // user registered successfully
             window.alert(json.msg); //alert user account was created
             window.location.href = '/#login' // redirect to login
+            
+        } else {
+            throw `${response.status}: ${json.msg}`;
         }
         
     } catch (error) {
@@ -53,9 +59,4 @@ async function passConfCheck(){
         passBox.style.borderBottom = "2px solid #4ea3e6";
         passConfBox.style.borderBottom = "2px solid red";
     } 
-}
-
-function emptyFields(object) {
-    // check if all object values are filled
-    return !Object.values(object).every( x => (x !== null && x !== ""));
 }
