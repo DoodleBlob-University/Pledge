@@ -1,1 +1,5 @@
-original_content
+/original_content
+
+*.codio
+/node_modules
+

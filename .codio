@@ -8,8 +8,8 @@
 
 // Preview button configuration
   "preview": {
-        "Live Site": "https://{{domain8080}}/{{index}}",
-        "Box URL": "http://{{domain3000}}/",
-        "Box URL SSL": "https://{{domain3000}}/"
+        "Project Index (static)": "https://{{domain}}/{{index}}",
+        "Current File (static)": "https://{{domain}}/{{filepath}}",
+        "Box URL": "https://{{domain3000}}/"
   }
 }
