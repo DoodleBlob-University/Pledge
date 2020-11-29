@@ -21,9 +21,11 @@
                     <button class="dropbtn" id="dropdownTitle">Log In
                         <i class="fas fa-camera"></i>
                     </button>
-                    <div class="dropdown-content">
-                      <a href="/#login">Log In</a>
-                      <a href="/#register">Register</a>
+                    <div class="dropdown-content" id="dropdown-content">
+                      <a id="loginbtn" href="/#login" style="display:none;">Log In</a>
+                      <a id="registerbtn" href="/#register" style="display:none;">Register</a>
+                      <a id="adminbtn" href="/#admin" style="display:none;">Admin Panel</a>
+                      <a id="logoutbtn" href="javascript:;" style="display:none;">Logout</a>
                     </div>
                 </div>
             </div>
@@ -34,7 +36,15 @@
         <main>
         </main>
         
-        <button onclick="scrollToTop()" id="scrolltotop" title="Go to top">⇧</button>
+        <div id="loading">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+        
+        <button id="scrolltotop" title="Go to top">⇧</button>
 
         <footer>
         </footer>
