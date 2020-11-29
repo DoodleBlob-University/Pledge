@@ -12,10 +12,10 @@ const defaultPort = 8080
 const port = process.env.PORT || defaultPort
 
 const db = "website.db"
-//const Account = require('./modules/user')
-//const List = require('./modules/list')
+const Account = require('./modules/accounts')
 
 app.use(koaStatic('public'))
+
 
 router.get('/', async ctx => {
 	try {
@@ -26,30 +26,40 @@ router.get('/', async ctx => {
 	}
 })
 
-/* // CTX.RENDER NOT A FUNCTION
-router.get('/login', async ctx => {
-	await ctx.render('login', ctx.hbs)
-})
-*/
-
 router.post("/register", koaBody, async ctx=> {
     console.log("POST: register")
-    /*ctx.status = 201;
-    ctx.body = {status: "success", msg: "Account successfully created"}*/
-    
+    const acc = await new Account(db); // construct account class
     try{
+        const body = JSON.parse(ctx.request.body);
+        await acc.register(body.email, body.username, body.password);
+        ctx.status = 201; //account created successfully
+        ctx.body = { status: "success", msg: "Account created successfully"}
         
+    } catch(error) {
+        // account failed to be created
+        ctx.status = 422;
+        ctx.body = { status: "error", msg: error.message }
+    
+    } finally {
+        acc.close();
+    }
+})
+
+router.get("/login", async ctx=> {
+    console.log("GET: login")
+    const acc = await new Account(db); // construct account class
+    try{
         
         
     } catch(error) {
         
-        
-        
-    }
     
+    } finally {
+        acc.close();
+    }
 })
 
-//router.post("/login")
+
 
 app.use(router.routes())
 module.exports = app.listen(port, () => console.log(`Listening on ${port}`))

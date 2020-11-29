@@ -20,8 +20,14 @@ async function register(event){
         const body = { method: 'post', body: JSON.stringify(data) }
         const response = await fetch("/register", body)
         const json = await response.json();
-        window.alert(json.msg); //alert user account was created
-        window.location.href = '/#login' // redirect to login
+        
+        if( response.status === 422){
+            // error in creating the account
+            throw json.msg // throw error message
+        } else {
+            window.alert(json.msg); //alert user account was created
+            window.location.href = '/#login' // redirect to login
+        }
         
     } catch (error) {
         var errorBox = document.getElementById('error'); // display error
