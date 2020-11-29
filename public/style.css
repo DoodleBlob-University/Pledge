@@ -121,6 +121,7 @@ html, body {
 }
 
 .dropdown .dropbtn {
+    display: none;
     color: inherit;
     background-color: inherit;
     font-family: inherit;

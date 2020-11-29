@@ -37,8 +37,8 @@ async function login() {
         createCookie("pledgeuser", JSON.stringify({ username: data.username, 
                                                    encodedData: encodedData, 
                                                    admin: json.admin }, 1) );
-        console.log ( getCookie("pledgeuser") );
-        //window.location.href = "/";
+        //console.log ( getCookie("pledgeuser") );
+        window.location.href = "/";
 
 
 	} catch (error) {

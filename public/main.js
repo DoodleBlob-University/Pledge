@@ -1,5 +1,8 @@
+import { getCookie, deleteCookie } from './assets/js/functions.js'
+
 // when page first loads
 window.addEventListener('DOMContentLoaded', async event => {
+    loadCookie("pledgeuser");
 	load()
 })
 // every time # changes in url, event triggered
@@ -20,6 +23,7 @@ async function load() {
         
         // TODO: cookies auth
         
+        
         // run js for page
         pageModule.setup()
 
@@ -33,6 +37,29 @@ async function load() {
     document.getElementById('loading').style.display = "none"; // hides loading dots
 
 }
+
+function loadCookie(name){
+    try{
+        var json = getCookie(name);
+        json = JSON.parse( json ); // json string with cookie info
+        // navbar changes for user
+        document.getElementById("dropdownTitle").innerHTML = json.username;
+        if( json.admin !== 0 ) document.getElementById("adminbtn").style.display = "block";
+        document.getElementById("logoutbtn").style.display = "block";
+    } catch {
+        // no cookie :(
+        document.getElementById("loginbtn").style.display = "block";
+        document.getElementById("registerbtn").style.display = "block";
+        
+    } finally {
+        document.getElementById("dropdownTitle").style.display = "block";
+    }
+}
+
+document.getElementById("logoutbtn").addEventListener("click", ()=>{
+    deleteCookie("pledgeuser");
+    window.location.href = "/";
+});
 
 
 /* --- scroll to top button --- */

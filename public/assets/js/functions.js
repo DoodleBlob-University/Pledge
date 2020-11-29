@@ -4,11 +4,11 @@ export function emptyFields(object) {
 }
 
 export function encodeUserPass(user, pass) {
-	const userpass = `${user}:${pass}`
+	const userpass = `${user}:${pass}`;
 	// encode user and password in base64
-	const encode = btoa(userpass)
-	console.log(encode)
-	return encode
+	const encode = btoa(userpass);
+	console.log(encode);
+	return encode;
 }
 
 /* --- cookies --- */
@@ -25,6 +25,6 @@ export function getCookie(name){
     return v ? v[2] : null;
 }
 
-export function deleteCookie(){
+export function deleteCookie(name){
     createCookie(name, "", -1);
 }
