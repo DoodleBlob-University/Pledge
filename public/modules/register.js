@@ -4,9 +4,10 @@ export function setup() {
 	// wait for form submission, then run login()
 	document.querySelector('form').addEventListener('submit', async event => await register(event))
 	// detect changes in password and passwordconf box
-	document.getElementById('password').addEventListener('input', async event => await passConfCheck())
-	document.getElementById('passwordconf').addEventListener('input', async event => await passConfCheck())
+	document.getElementById('password').addEventListener('input', async event => await passConfCheck(event))
+	document.getElementById('passwordconf').addEventListener('input', async event => await passConfCheck(event))
 }
+
 
 // eslint-disable-next-line complexity
 async function register(event) {

@@ -7,18 +7,20 @@
 		"browser": true,
 		"jest": true
 	},
+    "parser": "babel-eslint",
 	"parserOptions": {
 		"ecmaVersion": 2018,
 		"noInlineConfig": true,
 		"reportUnusedDisableDirectives": true,
-		"sourceType": "module"
+		"sourceType": "module",
+        "allowImportExportEverywhere": true
 	},
 	"rules": {
 		"arrow-body-style": "error",
 		"arrow-spacing": ["warn", {"before": true, "after": true}],
 		"brace-style": "error",
 		"camelcase": ["error", {"properties": "never"}],
-		"complexity": ["error", 5],
+		"complexity": ["warn", 5],
 		"eol-last": "warn",
 		"eqeqeq": "error",
 		"func-call-spacing": ["error", "never"],
@@ -44,7 +46,7 @@
 		"no-extra-parens": "error",
 		"no-func-assign": "error",
 		"no-irregular-whitespace": "error",
-		"no-magic-numbers": ["warn", {"ignore": [-1, 0, 1]}],
+		"no-magic-numbers": /*["warn", {"ignore": [-1, 0, 1]}],*/"off",
 		"no-multi-spaces": "warn",
 		"no-multi-str": "off",
 		"no-unexpected-multiline": "error",

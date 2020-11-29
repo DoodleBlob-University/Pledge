@@ -1,4 +1,4 @@
-import { emptyFields, encodeUserPass, createCookie, getCookie } from '../assets/js/functions.js'
+import { emptyFields, encodeUserPass, createCookie } from '../assets/js/functions.js'
 
 export function setup() {
 	// todo check cookie to see if already logged in
@@ -23,22 +23,22 @@ async function login() {
 
 		if( response.status === 401) {
 			// error logging in
-			throw json.msg;
+			throw json.msg
 		} else if ( response.status === 200) {
 			// logged in successfully
 			console.log( json )
 
 		} else {
-            // any unexpected response codes
+			// any unexpected response codes
 			throw `${response.status}: ${json.msg}`
 		}
-        
-        // create cookie with 1 day expiry
-        createCookie("pledgeuser", JSON.stringify({ username: data.username, 
-                                                   encodedData: encodedData, 
-                                                   admin: json.admin }, 1) );
-        //console.log ( getCookie("pledgeuser") );
-        window.location.href = "/";
+
+		// create cookie with 1 day expiry
+		createCookie('pledgeuser', JSON.stringify({ username: data.username,
+			encodedData: encodedData,
+			admin: json.admin }, 1) )
+		//console.log ( getCookie("pledgeuser") );
+		window.location.href = '/'
 
 
 	} catch (error) {
