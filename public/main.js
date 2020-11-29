@@ -7,6 +7,9 @@ window.addEventListener('hashchange', async event => await load())
 
 async function load() {
     
+    document.querySelector('main').style.display = "none"; // hides main html
+    document.getElementById('loading').style.display = "block";
+    
 	try {
         // page equals string after # or if none, 'home'
         const page = location.hash.length > 1 ? location.hash.substring(1) : 'home'
@@ -17,13 +20,17 @@ async function load() {
         
         // TODO: cookies auth
         
-        // TODO: module.setup()
+        pageModule.setup()
 
 	} catch(err) {
 		// page doesnt exist
 		console.log(err)
 		window.location.href = '/#404'
 	}
+    
+    document.querySelector('main').style.display = "block"; // displays upon page loading    
+    document.getElementById('loading').style.display = "none";
+
 }
 
 window.addEventListener('scroll', function() {
