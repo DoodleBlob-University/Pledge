@@ -1,5 +1,6 @@
 @import url(https://fonts.googleapis.com/css?family=Roboto);
 @import url(https://fonts.googleapis.com/css?family=Overpass);
+@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
 
 /* -- main -- */
 
@@ -205,19 +206,19 @@ html, body {
 
 /* -- forms -- */
 
-.loginregister {
+.form {
     text-align: center;
 }
 
-.loginregister h1 {
+.form h1 {
    padding-bottom: 10px;
 }
 
-.loginregister label {
+.form label {
     font-size: 13px;
 }
 
-.loginregister input {
+.form input {
     border: none;
     border-bottom: 2px solid #4ea3e6;
     text-align: center;
@@ -227,7 +228,7 @@ html, body {
     padding: 3px;
 }
 
-.loginregister button {
+.form button {
     color: white;
     background-color: #4ea3e6;
     outline: none;
@@ -238,14 +239,91 @@ html, body {
     font-size: 15px;
 }
 
-.loginregister button:hover {
+.form button:hover {
     background-color: #4e60e6;
    
 }
 
-.loginregister #error {
+.form #error {
     display: none;
     font-size: 13px;
     border: 2px solid red;
     padding: 5px;
+}
+
+/* -- create pledge -- */
+
+.form .targetcontainer {
+    margin: 0 auto;
+    background-color: #8acbff;
+    width: 100%;
+    border-radius: 10px;
+    font-family: "Open Sans";
+}
+
+.form .targetcontainer .fundingtitle {
+    font-size: 20px;
+    font-weight: 40px;
+    text-align: center;
+    padding-top: 20px;
+}
+
+.form .targetcontainer .fundingwrap {
+    color: #031d33;
+    padding-top: 10px;
+    padding-bottom: 20px;
+    font-size: 60px;
+    font-weight: bold;
+}
+
+.form .targetcontainer .fundingwrap #fundinggoal {
+    color: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    width: 20%;
+    background-color: inherit;
+}
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.form #canvas {
+    background-color: #edf1f5;
+    border-radius: 5px;
+}
+
+.form #fileinput {
+    display: none;
+}
+
+.form .custom-fileupload {
+    font-family: Overpass;
+    font-weight: Bold;
+    position: absolute;
+    z-index: 1;
+    border: 1px solid #2b2d42;
+    display: inline-block;
+    cursor: pointer;
+    padding: 6px 12px;
+    margin-top: -50px;
+    margin-left: -4.5%;
+    background-color: #30FFb7;
+    border-radius: 8px;
+}
+
+
+.form #description {
+    margin: 0 auto;
+    width: 775px;
+    padding: 25px;
+    border: 2px solid #2b2d42;
+    text-align: left;
+    border-radius: 8px;
 }

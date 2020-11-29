@@ -22,6 +22,7 @@ admin BOOLEAN NOT NULL CHECK (admin IN (0,1)));'
 	}
 
 	//REGISTER NEW USER
+	/* eslint-disable complexity, max-lines-per-function */
 	async register(email, username, password) {
 		try {
 			// check if any fields are empty
@@ -52,6 +53,8 @@ admin BOOLEAN NOT NULL CHECK (admin IN (0,1)));'
 			throw error
 		}
 	}
+	/* eslint-enable complexity, max-lines-per-function */
+
 
 	//LOGIN USER
 	async login(encodedData) {

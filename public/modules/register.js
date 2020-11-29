@@ -9,7 +9,7 @@ export function setup() {
 }
 
 
-// eslint-disable-next-line complexity
+/* eslint-disable complexity, max-lines-per-function */
 async function register(event) {
 	event.preventDefault() // stops standard html form submission
 	document.getElementById('error').style.display = 'none' // hide error message box
@@ -43,6 +43,8 @@ async function register(event) {
 		errorBox.firstChild.innerHTML = error // change text of inner div
 	}
 }
+/* eslint-enable complexity, max-lines-per-function */
+
 
 async function passConfCheck() {
 	const passBox = document.getElementById('password')

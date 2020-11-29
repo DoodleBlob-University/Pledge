@@ -6,6 +6,7 @@ export function setup() {
 	document.querySelector('form').addEventListener('submit', async event => await login(event))
 }
 
+/* eslint-disable complexity, max-lines-per-function */
 async function login() {
 	event.preventDefault() // stops standard html form submission
 	document.getElementById('error').style.display = 'none' // hide error message box
@@ -47,3 +48,5 @@ async function login() {
 		errorBox.firstChild.innerHTML = error // change text of inner div
 	}
 }
+/* eslint-enable complexity, max-lines-per-function */
+
