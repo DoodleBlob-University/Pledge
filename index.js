@@ -11,7 +11,7 @@ const router = new Router()
 const defaultPort = 8080
 const port = process.env.PORT || defaultPort
 
-//const dbName = 'website.db'
+const db = "website.db"
 //const Account = require('./modules/user')
 //const List = require('./modules/list')
 
@@ -31,6 +31,25 @@ router.get('/login', async ctx => {
 	await ctx.render('login', ctx.hbs)
 })
 */
+
+router.post("/register", koaBody, async ctx=> {
+    console.log("POST: register")
+    /*ctx.status = 201;
+    ctx.body = {status: "success", msg: "Account successfully created"}*/
+    
+    try{
+        
+        
+        
+    } catch(error) {
+        
+        
+        
+    }
+    
+})
+
+//router.post("/login")
 
 app.use(router.routes())
 module.exports = app.listen(port, () => console.log(`Listening on ${port}`))

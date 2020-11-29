@@ -3,3 +3,4 @@
 *.codio
 /node_modules
 
+website.db
