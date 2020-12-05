@@ -6,6 +6,16 @@ const koaStatic = require('koa-static')
 const koaBody = require('koa-body')({multipart: true, uploadDir: '.'})
 
 const app = new Koa()
+
+const path = require('path')
+const render = require('koa-ejs')
+render(app, {
+	root: path.join(__dirname, 'views'),
+	layout: false,
+	viewExt: 'handlebars',
+	cache: false
+})
+
 const router = new Router()
 
 const defaultPort = 8080
@@ -13,6 +23,7 @@ const port = process.env.PORT || defaultPort
 
 const db = 'website.db'
 const Account = require('./modules/accounts')
+const Pledge = require('./modules/pledges')
 
 app.use(koaStatic('public'))
 
@@ -64,6 +75,42 @@ router.get('/login', async ctx => {
 	} finally {
 		acc.close()
 	}
+})
+
+router.post('/pledge', koaBody, async ctx => {
+	console.log('POST: pledge')
+	const plg = await new Pledge(db) // construct account class
+	try{
+        const body = ctx.request.body
+        const image = ctx.request.files.image
+        
+		//const body = JSON.parse(ctx.request.body)
+		//await plg.newpledge(body)
+		ctx.status = 201 //account created successfully
+		ctx.body = { status: 'success', msg: ''}
+
+	} catch(error) {
+		// account failed to be created
+		ctx.status = 422
+		ctx.body = { status: 'error', msg: error.message }
+
+	} finally {
+		plg.close()
+	}
+})
+
+router.get('/:value', async ctx => {
+	console.log(ctx.params.value)
+	//ctx.hbs.id = ctx.params.id
+	await ctx.render('pledge')
+
+})
+
+router.get('/:value/pledge', async ctx => {
+	console.log(ctx.params.value)
+	//ctx.hbs.id = ctx.params.id
+	await ctx.render('donate')
+
 })
 
 

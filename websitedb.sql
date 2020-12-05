@@ -14,3 +14,18 @@ INSERT INTO users(email, username, password, admin) VALUES (\
 UPDATE users SET admin = 1 WHERE username = 'admin';
 
 SELECT username, password, admin FROM users WHERE username = '${username}';
+
+CREATE TABLE IF NOT EXISTS pledges(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title VARCHAR(60) NOT NULL,
+    image BLOB NOT NULL,
+    moneyRaised INTEGER,
+    moneyTarget INTEGER NOT NULL,
+    deadline INTEGER NOT NULL,
+    description VARCHAR(600) NOT NULL,
+    longitude INTEGER,
+    latitude INTEGER,
+    creator VARCHAR(30) NOT NULL,
+    approved BOOLEAN NOT NULL CHECK (approved IN (0,1)),
+    FOREIGN KEY(creator) REFERENCES users(username)
+);

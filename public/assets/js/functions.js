@@ -31,36 +31,37 @@ export function deleteCookie(name) {
 
 /* --- canvas --- */
 
-export function previewImage(input){
-    var reader;
-    let ctx = document.getElementById("canvas").getContext("2d")
-    var image = new Image();
-    image.onload = function() {
-        drawImageScaled(image, ctx)
-    }
-    
-    if ( input.files ){
-        if (!input.files[0].name.endsWith(".jpg") &&
-            !input.files[0].name.endsWith(".jpeg") && 
-            !input.files[0].name.endsWith(".png")){
-            window.alert("File must be a .jpeg or .png")
-            return false
-        }
-        var output = URL.createObjectURL( input.files[0] )
-        image.src = output
-    }
+export function previewImage(input) {
+	let reader
+	const ctx = document.getElementById('canvas').getContext('2d')
+	const image = new Image()
+	image.onload = function() {
+		drawImageScaled(image, ctx)
+	}
+
+	if ( input.files ) {
+		if (!input.files[0].name.endsWith('.jpg') &&
+            !input.files[0].name.endsWith('.jpeg') &&
+            !input.files[0].name.endsWith('.png')) {
+			window.alert('File must be a .jpeg or .png')
+			return false
+		}
+		const output = URL.createObjectURL( input.files[0] )
+		image.src = output
+        return output
+	}
 }
 
 
 //https://stackoverflow.com/a/23105310
 export function drawImageScaled(img, ctx) {
-   var canvas = ctx.canvas ;
-   var hRatio = canvas.width  / img.width    ;
-   var vRatio =  canvas.height / img.height  ;
-   var ratio  = Math.min ( hRatio, vRatio );
-   var centerShift_x = ( canvas.width - img.width*ratio ) / 2;
-   var centerShift_y = ( canvas.height - img.height*ratio ) / 2;  
-   ctx.clearRect(0,0,canvas.width, canvas.height);
-   ctx.drawImage(img, 0,0, img.width, img.height,
-                      centerShift_x,centerShift_y,img.width*ratio, img.height*ratio);  
+	const canvas = ctx.canvas
+	const hRatio = canvas.width / img.width
+	const vRatio = canvas.height / img.height
+	const ratio = Math.min( hRatio, vRatio )
+	const centerShift_x = ( canvas.width - img.width*ratio ) / 2
+	const centerShift_y = ( canvas.height - img.height*ratio ) / 2
+	ctx.clearRect(0,0,canvas.width, canvas.height)
+	ctx.drawImage(img, 0,0, img.width, img.height,
+		centerShift_x,centerShift_y,img.width*ratio, img.height*ratio)
 }
