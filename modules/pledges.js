@@ -29,31 +29,34 @@ FOREIGN KEY(creator) REFERENCES users(username));'
 
 	//CREATE NEW PLEDGE
 	async newpledge(body, image) {
+        let imagename
 		try {
-			//throw new Error("todo")
+			// TODO: error checking
+            var long = null
+            var lat = null
+            var unixDeadline = new Date(body.deadline).getTime() / 1000
             
-                
-			// check if any fields are empty
-			 
-            //console.log(body)
-            console.log(image)
-            await this.imageSetup(body, image)
-            // check deadline hasnt yet passed
+            imagename = await this.imageSetup(body, image) // upload img and make path
             
-
 			// add to database
-            
-
+            let sql = `INSERT INTO pledges(title, image, moneyRaised, moneyTarget, deadline,\
+description, longitude, latitude, creator, approved) VALUES (\
+'${body.pledgename}', '${imagename}', 0, ${body.fundgoal}, ${unixDeadline}, '${body.desc}',\
+${long}, ${lat}, '${body.creator}', 0);`
+            await this.db.run(sql)
 			return true
 
 		} catch (error) {
+            if(imagename){ // remove image from filesystem (if possible)
+                fs.remove(`public/assets/images/pledges/${imagename}`, err => {})
+            }
 			throw error
 		}
 	}
     
     async imageSetup(body, image){
+        // upload image to filesystem
         let saveName = `${Date.now()}-${body.pledgename.replace(/\s/g, "-")}.${mime.extension(image.type)}`
-        console.log(saveName)
         await fs.copy(image.path, `public/assets/images/pledges/${saveName}`)
         return saveName
     }

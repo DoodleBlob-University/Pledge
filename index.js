@@ -86,7 +86,7 @@ router.post('/pledge', koaBody, async ctx => {
         await plg.newpledge(body, image)
         
 		ctx.status = 201 //account created successfully
-		ctx.body = { status: 'success', msg: ''}
+		ctx.body = { status: 'success', msg: 'Pledge created successfully.\nWaiting for admin approval', url: ""}
 
 	} catch(error) {
 		// account failed to be created

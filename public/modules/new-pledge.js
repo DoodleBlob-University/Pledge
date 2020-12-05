@@ -24,16 +24,14 @@ async function submitPledge(event) {
 	try {
         var formData = new FormData( document.getElementById('newpledge') )
         formData.append("creator", JSON.parse(getCookie('pledgeuser')).username)
-        
+        // post form data
 		const options = { header: "multipart/form-data", method: 'post', body: formData }
 		const response = await fetch('/pledge', options)
 		const json = await response.json()
 
-		console.log(json)
-
 		if( response.status === 201 ) {
 			// success
-			//window.alert(json.msg) //alert user that pledge was created
+			window.alert(json.msg) //alert user that pledge was created
 			// TODO: redirect to pledge page
 
 		}else if( response.status === 422) {

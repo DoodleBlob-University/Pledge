@@ -8,8 +8,9 @@ CREATE TABLE IF NOT EXISTS users(
 
 SELECT COUNT(id) AS count FROM users WHERE username = '${username}';
 SELECT COUNT(id) AS count FROM users WHERE email = '${email}';
-INSERT INTO users(email, username, password, admin) VALUES (\
-'${email}', '${username}', '${password}', 0);
+
+INSERT INTO users(email, username, password, admin) 
+VALUES ('${email}', '${username}', '${password}', 0);
 
 UPDATE users SET admin = 1 WHERE username = 'admin';
 
@@ -29,3 +30,8 @@ CREATE TABLE IF NOT EXISTS pledges(
     approved BOOLEAN NOT NULL CHECK (approved IN (0,1)),
     FOREIGN KEY(creator) REFERENCES users(username)
 );
+
+INSERT INTO pledges(title, image, moneyRaised, moneyTarget, deadline, description, 
+    longitude, latitude, creator, approved) 
+    VALUES ('${body.pledgename}', '${imagename}', 0, ${body.fundgoal}, ${body.deadline}, '${body.desc}',
+    ${long}, ${lat}, '${body.creator}', 0);
