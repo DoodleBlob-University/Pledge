@@ -32,7 +32,6 @@ export function deleteCookie(name) {
 /* --- canvas --- */
 
 export function previewImage(input) {
-	let reader
 	const ctx = document.getElementById('canvas').getContext('2d')
 	const image = new Image()
 	image.onload = function() {
@@ -48,7 +47,6 @@ export function previewImage(input) {
 		}
 		const output = URL.createObjectURL( input.files[0] )
 		image.src = output
-        return output
 	}
 }
 
@@ -59,9 +57,9 @@ export function drawImageScaled(img, ctx) {
 	const hRatio = canvas.width / img.width
 	const vRatio = canvas.height / img.height
 	const ratio = Math.min( hRatio, vRatio )
-	const centerShift_x = ( canvas.width - img.width*ratio ) / 2
-	const centerShift_y = ( canvas.height - img.height*ratio ) / 2
+	const centerShiftX = ( canvas.width - img.width*ratio ) / 2
+	const centerShiftY = ( canvas.height - img.height*ratio ) / 2
 	ctx.clearRect(0,0,canvas.width, canvas.height)
 	ctx.drawImage(img, 0,0, img.width, img.height,
-		centerShift_x,centerShift_y,img.width*ratio, img.height*ratio)
+		centerShiftX,centerShiftY,img.width*ratio, img.height*ratio)
 }

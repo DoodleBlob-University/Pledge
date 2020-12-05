@@ -1,7 +1,7 @@
 const sqlite = require('sqlite-async')
 
-var mime = require('mime-types')
-var fs = require('fs-extra')
+const mime = require('mime-types')
+const fs = require('fs-extra')
 
 module.exports = class Account {
 
@@ -28,46 +28,59 @@ FOREIGN KEY(creator) REFERENCES users(username));'
 	}
 
 	//CREATE NEW PLEDGE
+	/* eslint-disable complexity, max-lines-per-function */
 	async newpledge(body, image) {
-        let imagename
+		let imagename
 		try {
 			// TODO: error checking
-            var long = null
-            var lat = null
-            var unixDeadline = new Date(body.deadline).getTime() / 1000
-            
-            imagename = await this.imageSetup(body, image) // upload img and make path
-            
+			await this.pledgeCheck(body, image) // TODO: input checking
+			const long = null
+			const lat = null
+			const unixDeadline = new Date(body.deadline).getTime() / 1000
+
+			imagename = await this.imageSetup(body, image) // upload img and make path
+
 			// add to database
-            let sql = `INSERT INTO pledges(title, image, moneyRaised, moneyTarget, deadline,\
+			const sql = `INSERT INTO pledges(title, image, moneyRaised, moneyTarget, deadline,\
 description, longitude, latitude, creator, approved) VALUES (\
 '${body.pledgename}', '${imagename}', 0, ${body.fundgoal}, ${unixDeadline}, '${body.desc}',\
 ${long}, ${lat}, '${body.creator}', 0);`
-            await this.db.run(sql)
-			return true
+			await this.db.run(sql)
+			
+            // returns url for pledge
+            const unix = imagename.substr(0,imagename.indexOf('-'));
+            const name = imagename.substr(imagename.indexOf('-')+1);
+            return `${unix}/${name}`
 
 		} catch (error) {
-            if(imagename){ // remove image from filesystem (if possible)
-                fs.remove(`public/assets/images/pledges/${imagename}`, err => {})
-            }
+			if(imagename) { // remove image from filesystem (if possible)
+				fs.remove(`public/assets/images/pledges/${imagename}`, err => {
+					throw `${error}\n\n${err}`
+				})
+			}
 			throw error
 		}
 	}
-    
-    async imageSetup(body, image){
-        // upload image to filesystem
-        let saveName = `${Date.now()}-${body.pledgename.replace(/\s/g, "-")}.${mime.extension(image.type)}`
-        await fs.copy(image.path, `public/assets/images/pledges/${saveName}`)
-        return saveName
-    }
+	/* eslint-enable complexity, max-lines-per-function */
+
+	async imageSetup(body, image) {
+		// upload image to filesystem
+		const saveName = `${Date.now()}-${body.pledgename.replace(/\s/g, '-')}.${mime.extension(image.type)}`
+		await fs.copy(image.path, `public/assets/images/pledges/${saveName}`)
+		return saveName
+	}
+
+	async pledgeCheck(body, image) {
+		return true
+	}
 
 
 	async getPledge() {
-
+		//todo
 	}
 
 	async listPledges() {
-
+		//todo
 	}
 
 	async close() {

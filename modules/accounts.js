@@ -26,9 +26,7 @@ admin BOOLEAN NOT NULL CHECK (admin IN (0,1)));'
 	async register(email, username, password) {
 		try {
 			// check if any fields are empty
-			if( email.length === 0 || username.length === 0 || password.length === 0) {
-				throw new Error('Not all fields are filled')
-			}
+			await this.registerCheck(email, username, password) // TODO: input checking
 
 			// check if username already exists
 			let sql = `SELECT COUNT(id) AS count FROM users WHERE username = '${username}';`
@@ -54,7 +52,14 @@ admin BOOLEAN NOT NULL CHECK (admin IN (0,1)));'
 		}
 	}
 	/* eslint-enable complexity, max-lines-per-function */
-
+	async registerCheck(email, username, password) {
+		/*
+        if( email.length === 0 || username.length === 0 || password.length === 0) {
+            throw new Error('Not all fields are filled')
+        }
+        */
+		return true
+	}
 
 	//LOGIN USER
 	async login(encodedData) {

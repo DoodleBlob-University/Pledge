@@ -2,6 +2,7 @@ const Koa = require('koa')
 const send = require('koa-send')
 const Router = require('koa-router')
 const koaStatic = require('koa-static')
+const views = require('koa-views')
 
 const koaBody = require('koa-body')({multipart: true, uploadDir: '.'})
 
@@ -12,8 +13,8 @@ const render = require('koa-ejs')
 render(app, {
 	root: path.join(__dirname, 'views'),
 	layout: false,
-	viewExt: 'handlebars',
-	cache: false
+	viewExt: 'html',
+	cache: false,
 })
 
 const router = new Router()
@@ -25,8 +26,17 @@ const db = 'website.db'
 const Account = require('./modules/accounts')
 const Pledge = require('./modules/pledges')
 
-app.use(koaStatic('public'))
+async function getHandlebarData(ctx, next) {
+	console.log(`${ctx.method} ${ctx.path}`)
+	ctx.hbs = {
+		host: `https://${ctx.host}`
+	}
+	for(const key in ctx.query) ctx.hbs[key] = ctx.query[key]
+	await next()
+}
 
+app.use(koaStatic('public'))
+app.use(getHandlebarData)
 
 router.get('/', async ctx => {
 	try {
@@ -81,12 +91,11 @@ router.post('/pledge', koaBody, async ctx => {
 	console.log('POST: pledge')
 	const plg = await new Pledge(db) // construct account class
 	try{
-        const body = ctx.request.body
-        const image = ctx.request.files.image
-        await plg.newpledge(body, image)
-        
+		const body = ctx.request.body
+		const image = ctx.request.files.image
+		const url = await plg.newpledge(body, image)
 		ctx.status = 201 //account created successfully
-		ctx.body = { status: 'success', msg: 'Pledge created successfully.\nWaiting for admin approval', url: ""}
+		ctx.body = { status: 'success', msg: 'Pledge created successfully.\nWaiting for admin approval', url: url }
 
 	} catch(error) {
 		// account failed to be created
@@ -98,17 +107,20 @@ router.post('/pledge', koaBody, async ctx => {
 	}
 })
 
-router.get('/:value', async ctx => {
-	console.log(ctx.params.value)
+router.get('/:unix/:value', async ctx => {
+    console.log(ctx.hbs.host)
+    console.log(ctx.params.value)
+    ctx.hbs.title = ctx.params.value
+    console.log(ctx.hbs)
 	//ctx.hbs.id = ctx.params.id
-	await ctx.render('pledge')
+	await ctx.render('pledge', ctx.hbs)
 
 })
 
-router.get('/:value/pledge', async ctx => {
-	console.log(ctx.params.value)
+router.get('/:unix/:value/pledge', async ctx => {
+	//console.log(ctx.params.value)
 	//ctx.hbs.id = ctx.params.id
-	await ctx.render('donate')
+	await ctx.render('donate', ctx.hbs)
 
 })
 

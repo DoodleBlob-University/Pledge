@@ -1,6 +1,4 @@
-import { getCookie, previewImage, drawImageScaled, emptyFields } from '../assets/js/functions.js'
-
-var imagesrc
+import { getCookie, previewImage } from '../assets/js/functions.js'
 
 export function setup() {
 	// redirect to login if not yet logged in
@@ -12,20 +10,25 @@ export function setup() {
 	document.getElementById('fundinggoal').addEventListener('input', resizeInput)
 	// upon image upload, rescale and load image into canvas
 	document.getElementById('fileinput').addEventListener('change', function() {
-		imagesrc = previewImage(this)
+		previewImage(this)
 	})
 
 	document.getElementById('newpledge').addEventListener('submit', async event => await submitPledge(event))
 }
 
+/* eslint-disable complexity, max-lines-per-function */
 async function submitPledge(event) {
 	event.preventDefault() // stops standard html form submission
 	document.getElementById('error').style.display = 'none' // hide error message box
 	try {
-        var formData = new FormData( document.getElementById('newpledge') )
-        formData.append("creator", JSON.parse(getCookie('pledgeuser')).username)
-        // post form data
-		const options = { header: "multipart/form-data", method: 'post', body: formData }
+		const formData = new FormData( document.getElementById('newpledge') )
+		try{// adds username to formdata
+			formData.append('creator', JSON.parse(getCookie('pledgeuser')).username)
+		} catch (notloggedin) {
+			throw 'Please re-login'
+		}
+		// post form data
+		const options = { header: 'multipart/form-data', method: 'post', body: formData }
 		const response = await fetch('/pledge', options)
 		const json = await response.json()
 
@@ -48,6 +51,8 @@ async function submitPledge(event) {
 		errorBox.firstChild.innerHTML = error // change text of inner div
 	}
 }
+/* eslint-enable complexity, max-lines-per-function */
+
 
 function resizeInput() {
 	this.style.width = this.value.length > 0 ? `${+ this.value.length }ch` : `${this.value.length + 3 }ch`
