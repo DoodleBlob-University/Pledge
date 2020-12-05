@@ -1,7 +1,8 @@
-import { getCookie, deleteCookie } from './assets/js/functions.js'
+import { loadCookie, mainEventListeners } from './assets/js/functions.js'
 
 // when page first loads
 window.addEventListener('DOMContentLoaded', async event => {
+	mainEventListeners()
 	loadCookie('pledgeuser')
 	load(event)
 })
@@ -37,40 +38,3 @@ async function load() {
 
 }
 
-function loadCookie(name) {
-	try{
-		let json = getCookie(name)
-		json = JSON.parse( json ) // json string with cookie info
-		// navbar changes for user
-		document.getElementById('dropdownTitle').innerHTML = json.username
-		if( json.admin !== 0 ) document.getElementById('adminbtn').style.display = 'block'
-		document.getElementById('logoutbtn').style.display = 'block'
-	} catch {
-		// no cookie :(
-		document.getElementById('loginbtn').style.display = 'block'
-		document.getElementById('registerbtn').style.display = 'block'
-
-	} finally {
-		document.getElementById('dropdownTitle').style.display = 'block'
-	}
-}
-
-document.getElementById('logoutbtn').addEventListener('click', () => {
-	deleteCookie('pledgeuser')
-	window.location.href = '/'
-})
-
-
-/* --- scroll to top button --- */
-window.addEventListener('scroll', () => {
-	if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-		document.getElementById('scrolltotop').style.display = 'block'
-	} else {
-		document.getElementById('scrolltotop').style.display = 'none'
-	}
-})
-
-document.getElementById('scrolltotop').addEventListener('click', () => {
-	document.body.scrollTop = 0 // Safari
-	document.documentElement.scrollTop = 0 // Chrome, Firefox, IE, Opera
-})

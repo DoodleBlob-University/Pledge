@@ -63,3 +63,47 @@ export function drawImageScaled(img, ctx) {
 	ctx.drawImage(img, 0,0, img.width, img.height,
 		centerShiftX,centerShiftY,img.width*ratio, img.height*ratio)
 }
+
+
+/* --- main --- */
+export function loadCookie(name) {
+    var loggedin = false
+	try{
+		let json = getCookie(name)
+		json = JSON.parse( json ) // json string with cookie info
+		// navbar changes for user
+		document.getElementById('dropdownTitle').innerHTML = json.username
+		if( json.admin !== 0 ) document.getElementById('adminbtn').style.display = 'block'
+		document.getElementById('logoutbtn').style.display = 'block'
+        loggedin = true
+	} catch {
+		// no cookie :(
+		document.getElementById('loginbtn').style.display = 'block'
+		document.getElementById('registerbtn').style.display = 'block'
+
+	} finally {
+		document.getElementById('dropdownTitle').style.display = 'block'
+	}
+    return loggedin
+}
+
+export function mainEventListeners() {
+	document.getElementById('logoutbtn').addEventListener('click', () => {
+		deleteCookie('pledgeuser')
+		window.location.href = '/'
+	})
+
+	/* --- scroll to top button --- */
+	window.addEventListener('scroll', () => {
+		if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+			document.getElementById('scrolltotop').style.display = 'block'
+		} else {
+			document.getElementById('scrolltotop').style.display = 'none'
+		}
+	})
+
+	document.getElementById('scrolltotop').addEventListener('click', () => {
+		document.body.scrollTop = 0 // Safari
+		document.documentElement.scrollTop = 0 // Chrome, Firefox, IE, Opera
+	})
+}

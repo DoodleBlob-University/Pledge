@@ -2,7 +2,6 @@ const Koa = require('koa')
 const send = require('koa-send')
 const Router = require('koa-router')
 const koaStatic = require('koa-static')
-const views = require('koa-views')
 
 const koaBody = require('koa-body')({multipart: true, uploadDir: '.'})
 
@@ -48,7 +47,7 @@ router.get('/', async ctx => {
 })
 
 router.post('/register', koaBody, async ctx => {
-	console.log('POST: register')
+	console.log('POST register')
 	const acc = await new Account(db) // construct account class
 	try{
 		const body = JSON.parse(ctx.request.body)
@@ -67,7 +66,7 @@ router.post('/register', koaBody, async ctx => {
 })
 
 router.get('/login', async ctx => {
-	console.log('GET: login')
+	console.log('GET login')
 	const acc = await new Account(db) // construct account class
 	try{
 		const header = ctx.request.headers.data
@@ -88,7 +87,7 @@ router.get('/login', async ctx => {
 })
 
 router.post('/pledge', koaBody, async ctx => {
-	console.log('POST: pledge')
+	console.log('POST pledge')
 	const plg = await new Pledge(db) // construct account class
 	try{
 		const body = ctx.request.body
@@ -107,14 +106,28 @@ router.post('/pledge', koaBody, async ctx => {
 	}
 })
 
-router.get('/:unix/:value', async ctx => {
-    console.log(ctx.hbs.host)
-    console.log(ctx.params.value)
-    ctx.hbs.title = ctx.params.value
-    console.log(ctx.hbs)
-	//ctx.hbs.id = ctx.params.id
-	await ctx.render('pledge', ctx.hbs)
+router.get('/pledge', async ctx => {
+	console.log('GET pledge')
+	const plg = await new Pledge(db) // construct account class
+    try {
+        const unixTitle = ctx.request.headers.unixtitle
+        const pledgeData = await plg.getPledge(unixTitle)
+        // return pledge information
+        ctx.status = 200
+        ctx.body = { status: 'success', data: pledgeData }
+        
+    } catch(error) {
+        ctx.status = 401
+		ctx.body = { status: 'error', msg: error.message }
+        
+    } finally {
+        plg.close()
+    }
+})
 
+router.get('/:unix/:value', async ctx => {
+    ctx.hbs.title = ctx.params.value
+	await ctx.render('pledge', ctx.hbs)
 })
 
 router.get('/:unix/:value/pledge', async ctx => {

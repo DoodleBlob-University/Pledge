@@ -21,6 +21,7 @@ longitude INTEGER,\
 latitude INTEGER,\
 creator VARCHAR(30) NOT NULL,\
 approved BOOLEAN NOT NULL CHECK (approved IN (0,1)),\
+PRIMARY KEY(id, image),\
 FOREIGN KEY(creator) REFERENCES users(username));'
 			await this.db.run(sql)
 			return this
@@ -46,11 +47,11 @@ description, longitude, latitude, creator, approved) VALUES (\
 '${body.pledgename}', '${imagename}', 0, ${body.fundgoal}, ${unixDeadline}, '${body.desc}',\
 ${long}, ${lat}, '${body.creator}', 0);`
 			await this.db.run(sql)
-			
-            // returns url for pledge
-            const unix = imagename.substr(0,imagename.indexOf('-'));
-            const name = imagename.substr(imagename.indexOf('-')+1);
-            return `${unix}/${name}`
+
+			// returns url for pledge
+			const unix = imagename.substr(0,imagename.indexOf('-'))
+			const name = imagename.substr(imagename.indexOf('-')+1)
+			return `${unix}/${name}`
 
 		} catch (error) {
 			if(imagename) { // remove image from filesystem (if possible)
@@ -75,8 +76,19 @@ ${long}, ${lat}, '${body.creator}', 0);`
 	}
 
 
-	async getPledge() {
-		//todo
+	async getPledge(unixTitle) {
+		let sql = `SELECT COUNT(id) AS count FROM pledges WHERE image LIKE '${unixTitle}%'`
+        var result = await this.db.get(sql)
+        if( result.count === 1 ){
+            // get pledge data
+            sql = `SELECT * FROM pledges WHERE image LIKE '${unixTitle}%'`
+            const data = await this.db.get(sql)
+            // get list of people who donated
+            // TODO
+            
+            return data // return pledge data
+        }
+        throw new Error("Could not find Pledge in db")
 	}
 
 	async listPledges() {
