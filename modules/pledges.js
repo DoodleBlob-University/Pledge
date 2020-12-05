@@ -1,5 +1,7 @@
 const sqlite = require('sqlite-async')
 
+var mime = require('mime-types')
+var fs = require('fs-extra')
 
 module.exports = class Account {
 
@@ -26,15 +28,16 @@ FOREIGN KEY(creator) REFERENCES users(username));'
 	}
 
 	//CREATE NEW PLEDGE
-	async newpledge(json) {
+	async newpledge(body, image) {
 		try {
 			//throw new Error("todo")
             
-            console.log( json )
                 
 			// check if any fields are empty
-            
-            
+			 
+            //console.log(body)
+            console.log(image)
+            await this.imageSetup(body, image)
             // check deadline hasnt yet passed
             
 
@@ -47,6 +50,13 @@ FOREIGN KEY(creator) REFERENCES users(username));'
 			throw error
 		}
 	}
+    
+    async imageSetup(body, image){
+        let saveName = `${Date.now()}-${body.pledgename.replace(/\s/g, "-")}.${mime.extension(image.type)}`
+        console.log(saveName)
+        await fs.copy(image.path, `public/assets/images/pledges/${saveName}`)
+        return saveName
+    }
 
 
 	async getPledge() {

@@ -4,3 +4,5 @@
 /node_modules
 
 website.db
+
+public/assets/images/pledges/*

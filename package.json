@@ -16,6 +16,7 @@
 		"bcrypt": "^5.0.0",
 		"bcrypt-promise": "^2.0.0",
 		"browserify": "^17.0.0",
+		"fs-extra": "^9.0.1",
 		"koa": "^2.11.0",
 		"koa-body": "^4.1.1",
 		"koa-ejs": "^4.3.0",

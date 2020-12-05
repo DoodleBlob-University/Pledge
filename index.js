@@ -83,9 +83,8 @@ router.post('/pledge', koaBody, async ctx => {
 	try{
         const body = ctx.request.body
         const image = ctx.request.files.image
+        await plg.newpledge(body, image)
         
-		//const body = JSON.parse(ctx.request.body)
-		//await plg.newpledge(body)
 		ctx.status = 201 //account created successfully
 		ctx.body = { status: 'success', msg: ''}
 
