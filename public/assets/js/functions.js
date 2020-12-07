@@ -1,16 +1,16 @@
 /* --- Login --- */
 
 export function encodeData() {
-    // encode data from x amount of arguments
-    const args = Array.from(arguments)
-    let data
-    if( args.length === 1 ){
-        data = args[0]
-    } else if ( args.length === 0 ){
-        throw new Error("No arguments in encodeData()")
-    } else {
-        data = args.join(":")
-    }
+	// encode data from x amount of arguments
+	const args = Array.from(arguments)
+	let data
+	if( args.length === 1 ) {
+		data = args[0]
+	} else if ( args.length === 0 ) {
+		throw new Error('No arguments in encodeData()')
+	} else {
+		data = args.join(':')
+	}
 	// encode args in base64
 	const encode = btoa(data)
 	return encode
@@ -52,7 +52,7 @@ export function previewImage(input) {
 		}
 		const output = URL.createObjectURL( input.files[0] )
 		image.src = output
-        console.log(output)
+		console.log(output)
 	}
 }
 
@@ -73,7 +73,7 @@ export function drawImageScaled(img, ctx) {
 /* --- Main --- */
 
 export function loadCookie(name) {
-    var loggedin = false
+	let loggedin = false
 	try{
 		let json = getCookie(name)
 		json = JSON.parse( json ) // json string with cookie info
@@ -81,7 +81,7 @@ export function loadCookie(name) {
 		document.getElementById('dropdownTitle').innerHTML = json.username
 		if( json.admin !== 0 ) document.getElementById('adminbtn').style.display = 'block'
 		document.getElementById('logoutbtn').style.display = 'block'
-        loggedin = { user: json.username, admin: json.admin }
+		loggedin = { user: json.username, admin: json.admin }
 	} catch {
 		// no cookie :(
 		document.getElementById('loginbtn').style.display = 'block'
@@ -90,7 +90,7 @@ export function loadCookie(name) {
 	} finally {
 		document.getElementById('dropdownTitle').style.display = 'block'
 	}
-    return loggedin
+	return loggedin
 }
 
 export function mainEventListeners() {
@@ -121,31 +121,31 @@ export function emptyFields(object) {
 
 /* --- Pledges --- */
 
-export async function getPledge(unixTitle){
-    const options = { headers: { unixTitle: unixTitle } }
-    const response = await fetch('/pledge', options)
-    const json = await response.json()
-     
-    if( response.status !== 200 ) throw json.msg // if not successful throw error    
-    return json.data // return json
+export async function getPledge(unixTitle) {
+	const options = { headers: { unixTitle: unixTitle } }
+	const response = await fetch('/pledge', options)
+	const json = await response.json()
+
+	if( response.status !== 200 ) throw json.msg // if not successful throw error
+	return json.data // return json
 }
 
-export async function checkPledgeFinished(pledgeData){
-    if(pledgeData.approved === 0) {
-        return "Pledge awaiting Admin Approval"
-    } else if( pledgeData.moneyRaised >= pledgeData.moneyTarget ||
+export async function checkPledgeFinished(pledgeData) {
+	if(pledgeData.approved === 0) {
+		return 'Pledge awaiting Admin Approval'
+	} else if( pledgeData.moneyRaised >= pledgeData.moneyTarget ||
       ( new Date().getTime() / 1000 | 0 ) >= pledgeData.deadline ) {
-        return "Pledge Finished"
-    }
-    return false
+		return 'Pledge Finished'
+	}
+	return false
 }
 
 /* --- Donations --- */
 
-export function checkDonateable(finished, loggedin, creator){
-    // if user is admin or creator, they can donate
-    if( Boolean(finished) == true && !loggedin.admin && loggedin.user != creator ){
-        return false
-    }
-    return true
+export function checkDonateable(finished, loggedin, creator) {
+	// if user is admin or creator, they can donate
+	if( Boolean(finished) === true && !loggedin.admin && loggedin.user !== creator ) {
+		return false
+	}
+	return true
 }

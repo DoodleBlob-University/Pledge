@@ -40,7 +40,7 @@ async function login() {
 			admin: json.admin }, 1) )
 		//console.log ( getCookie("pledgeuser") );
 		//window.location.href = '/'
-        window.location=document.referrer; // go to previous page 
+		window.location=document.referrer // go to previous page
 
 	} catch (error) {
 		const errorBox = document.getElementById('error') // display error

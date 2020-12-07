@@ -109,62 +109,62 @@ router.post('/pledge', koaBody, async ctx => {
 router.get('/pledge', async ctx => {
 	console.log('GET pledge')
 	const plg = await new Pledge(db) // construct account class
-    try {
-        const unixTitle = ctx.request.headers.unixtitle
-        const pledgeData = await plg.getPledge(unixTitle)
-        // return pledge information
-        ctx.status = 200
-        ctx.body = { status: 'success', data: pledgeData }
-        
-    } catch(error) {
-        ctx.status = 401
+	try {
+		const unixTitle = ctx.request.headers.unixtitle
+		const pledgeData = await plg.getPledge(unixTitle)
+		// return pledge information
+		ctx.status = 200
+		ctx.body = { status: 'success', data: pledgeData }
+
+	} catch(error) {
+		ctx.status = 401
 		ctx.body = { status: 'error', msg: error.message }
-        
-    } finally {
-        plg.close()
-    }
+
+	} finally {
+		plg.close()
+	}
 })
 
 router.get('/donate', async ctx => {
-    console.log("GET donate")
-    const acc = await new Account(db) // construct account class
-    const don = await new Donation(db) // construct donation class
-    try {
-        // re-login using cookie data
-        const encodedUsr = ctx.request.headers.usr
+	console.log('GET donate')
+	const acc = await new Account(db) // construct account class
+	const don = await new Donation(db) // construct donation class
+	try {
+		// re-login using cookie data
+		const encodedUsr = ctx.request.headers.usr
 		const loginStatus = await acc.login(encodedUsr)
-        // submit payment
-        const encodedCc = ctx.request.headers.cc
-        const forcedPaymentFailure = ctx.request.headers.fail
-        const donationStatus = await don.donate(encodedCc, loginStatus.username, forcedPaymentFailure)
-        //
-        ctx.status = 200
-        ctx.body = { status: 'success', msg: "Donation successful" }
-        
-    } catch(error) {
-        ctx.status = 401
-        ctx.body = { status: 'error', msg: error.message }
-        
-    }
+		// submit payment
+		const encodedCc = ctx.request.headers.cc
+		const forcedPaymentFailure = ctx.request.headers.fail
+		await don.donate(encodedCc, loginStatus.username, forcedPaymentFailure)
+		//
+		ctx.status = 200
+		ctx.body = { status: 'success', msg: 'Donation successful' }
+
+	} catch(error) {
+		ctx.status = 401
+		ctx.body = { status: 'error', msg: error.message }
+
+	}
 })
 
-router.get("/donations", async ctx => {
-    console.log("GET donations")
-    const don = await new Donation(db)
-    try {
-        const pledgeId = ctx.request.headers.id
-        const data = await don.getDonations(pledgeId)
-        ctx.status = 200
-        ctx.body = { status: "success", data: data }
-        
-    } catch (error) {
-        ctx.status = 401
-        ctx.body = { status: 'error', msg: error.message }
-    }
+router.get('/donations', async ctx => {
+	console.log('GET donations')
+	const don = await new Donation(db)
+	try {
+		const pledgeId = ctx.request.headers.id
+		const data = await don.getDonations(pledgeId)
+		ctx.status = 200
+		ctx.body = { status: 'success', data: data }
+
+	} catch (error) {
+		ctx.status = 401
+		ctx.body = { status: 'error', msg: error.message }
+	}
 })
 
 router.get('/:unix/:value', async ctx => {
-    ctx.hbs.title = ctx.params.value
+	ctx.hbs.title = ctx.params.value
 	await ctx.render('pledge', ctx.hbs)
 })
 

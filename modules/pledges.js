@@ -39,18 +39,18 @@ FOREIGN KEY(creator) REFERENCES users(username));'
 			const unixDeadline = new Date(body.deadline).getTime() / 1000
 
 			imagename = await this.imageSetup(body, image) // upload img and make path
-            
+
 			// add to database
-			const sql = `INSERT INTO pledges(title, image, moneyTarget, deadline,\
-description, longitude, latitude, creator, approved) VALUES (\
-'${body.pledgename}', '${imagename}', ${body.fundgoal}, ${unixDeadline}, '${body.desc}',\
+			const sql = `INSERT INTO pledges(title, image, moneyTarget, deadline,
+description, longitude, latitude, creator, approved) VALUES (
+'${body.pledgename}', '${imagename}', ${body.fundgoal}, ${unixDeadline}, '${body.desc}',
 ${long}, ${lat}, '${body.creator}', 0);`
 			await this.db.run(sql)
-          
+
 			// returns url for pledge
 			const unix = imagename.substr(0,imagename.indexOf('-'))
 			const imgname = imagename.substr(imagename.indexOf('-')+1)
-            const name = imgname.substr(0, imgname.lastIndexOf('.'))
+			const name = imgname.substr(0, imgname.lastIndexOf('.'))
 			return `${unix}/${name}`
 
 		} catch (error) {
@@ -72,23 +72,24 @@ ${long}, ${lat}, '${body.creator}', 0);`
 	}
 
 	async pledgeCheck(body, image) {
-        // TODO
+		// TODO
 		return true
 	}
 
 
 	async getPledge(unixTitle) {
-        //moneyRaised
+		//moneyRaised
 		let sql = `SELECT COUNT(id) AS count FROM pledges WHERE image LIKE '${unixTitle}.%'`
-        var result = await this.db.get(sql)
-        if( result.count === 1 ){
-            // get pledge data
-            sql = `SELECT pledges.*, SUM(donations.amount) AS moneyRaised FROM pledges LEFT JOIN donations ON pledges.id = donations.pledgeId WHERE pledges.image LIKE '${unixTitle}.%';`
-            const data = await this.db.get(sql)
-          
-            return data // return pledge data
-        }
-        throw new Error("Could not find Pledge in db")
+		const result = await this.db.get(sql)
+		if( result.count === 1 ) {
+			// get pledge data
+			sql = `SELECT pledges.*, SUM(donations.amount) AS moneyRaised FROM 
+pledges LEFT JOIN donations ON pledges.id = donations.pledgeId WHERE pledges.image LIKE '${unixTitle}.%';`
+			const data = await this.db.get(sql)
+
+			return data // return pledge data
+		}
+		throw new Error('Could not find Pledge in db')
 	}
 
 	async listPledges() {
