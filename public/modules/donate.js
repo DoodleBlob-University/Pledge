@@ -50,14 +50,32 @@ async function donate(event){
     document.getElementById("submitfail").disabled = true
     const fail = event.submitter.id === "submitfail" ? true : false // if button invokes failed payment
     try {
-        
-        // todo check input fields
-        
+                
         const form = document.getElementById("donation")
 		const data = Object.fromEntries(new FormData(form).entries())
         console.log(data)
         
+        // todo check input fields
         
+        // get encoded data
+        const cardCred = encodeData(data.amount, data.ccnumber, data.cvc, data.ccname, data.ccexp)
+        const userCred = JSON.parse(getCookie("pledgeuser")).encodedData
+        
+        const options = { headers: { cc: cardCred, usr: userCred, fail: fail } }
+        const response = await fetch("/donate", options)
+        const json = await response.json()
+        
+        if( response.status === 200 ) {
+            // success
+            console.log(json)
+            
+        } else if ( response.status === 401 ){
+            // failure
+            throw json.msg
+        } else {
+			// any unexpected response codes
+			throw `${response.status}: ${json.msg}`
+		}
         
     } catch (error) {
         const errorBox = document.getElementById('error') // display error

@@ -6,7 +6,7 @@ const fs = require('fs-extra')
 module.exports = class Account {
 
 	constructor(dbName = ':memory:') {
-		// todo: create database if not yet existing
+		// create database if not yet existing
 		return (async() => {
 			this.db = await sqlite.open(dbName)
 			const sql = 'CREATE TABLE IF NOT EXISTS pledges(\
@@ -73,6 +73,7 @@ ${long}, ${lat}, '${body.creator}', 0);`
 	}
 
 	async pledgeCheck(body, image) {
+        // TODO
 		return true
 	}
 

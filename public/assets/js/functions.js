@@ -13,7 +13,6 @@ export function encodeData() {
     }
 	// encode args in base64
 	const encode = btoa(data)
-	console.log(encode)
 	return encode
 }
 

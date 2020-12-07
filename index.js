@@ -24,6 +24,7 @@ const port = process.env.PORT || defaultPort
 const db = 'website.db'
 const Account = require('./modules/accounts')
 const Pledge = require('./modules/pledges')
+const Donation = require('./modules/donations')
 
 async function getHandlebarData(ctx, next) {
 	//console.log(`${ctx.method} ${ctx.path}`)
@@ -124,8 +125,28 @@ router.get('/pledge', async ctx => {
     }
 })
 
-router.post('/donate', koaBody, async ctx => {
-    
+router.get('/donate', async ctx => {
+    console.log("GET donate")
+    const acc = await new Account(db) // construct account class
+    const don = await new Donation(db) // construct donation class
+    try {
+        // re-login using cookie data
+        const encodedUsr = ctx.request.headers.usr
+		const loginStatus = await acc.login(encodedUsr)
+        // submit payment
+        const encodedCc = ctx.request.headers.cc
+        const forcedPaymentFailure = ctx.request.headers.fail
+        const donationStatus = await don.donate(encodedCc, forcedPaymentFailure)
+        //
+        ctx.status = 200
+        ctx.body = { status: 'success', msg: "yes" }
+        
+    } catch(error) {
+        console.log(error)
+        ctx.status = 401
+        ctx.body = { status: 'success', msg: error.msg }
+        
+    }
 })
 
 router.get('/:unix/:value', async ctx => {
