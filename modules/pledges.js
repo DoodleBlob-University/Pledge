@@ -94,6 +94,8 @@ pledges LEFT JOIN donations ON pledges.id = donations.pledgeId WHERE pledges.ima
 
 	async listPledges() {
 		//todo
+        
+        
 	}
 
 	async close() {

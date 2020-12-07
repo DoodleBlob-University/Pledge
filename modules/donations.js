@@ -28,7 +28,6 @@ FOREIGN KEY(pledgeId) REFERENCES pledges(id));'
 		const sql = `INSERT INTO donations(amount, user, pledgeId) VALUES (\
 ${amount}, '${username}', ${pledgeid});`
 		const result = await this.db.run(sql)
-		console.log(result)
 		const donationId = result.lastID
 
 		try {
