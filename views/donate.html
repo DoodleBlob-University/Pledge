@@ -1,1 +1,64 @@
-Donate
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title id="urltitle">. . .</title>
+        <link rel="stylesheet" href="<%= host + '/style.css' %>">
+        <link rel="icon" type="image/png" href="<%= host + '/assets/images/PledgeLogo.png' %>" />
+        <script type="module" src="<%= host + '/modules/donate.js' %>"></script>
+    </head>
+    
+    <body>
+        <header>
+        <div class="nav">
+            <a href="/" style="padding:7px 0px 0px 100px;">
+                <img src="<%= host + '/assets/images/PledgeLogo.png' %>" class="logo">
+            </a>
+            <a href="/">Pledge</a>
+
+            <div class="profilelogin">
+                <div class="dropdown" style="float:right; padding-right:10%;">
+                    <button class="dropbtn" id="dropdownTitle">Log In
+                        <i class="fas fa-camera"></i>
+                    </button>
+                    <div class="dropdown-content" id="dropdown-content">
+                      <a id="loginbtn" href="/#login" style="display:none;">Log In</a>
+                      <a id="registerbtn" href="/#register" style="display:none;">Register</a>
+                      <a id="adminbtn" href="/#admin" style="display:none;">Admin Panel</a>
+                      <a id="logoutbtn" href="javascript:;" style="display:none;">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </header>
+        
+        <main style="display:none;">
+            <div class="feed">
+                <div class="content" style="min-width:840px;max-width:840px;margin:15px auto 0;">
+                    <div class="text">
+
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        
+        <div id="loading" style="display:block;">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+        
+        <button id="scrolltotop" title="Go to top">⇧</button>
+
+        <footer>
+        </footer>
+    </body>
+    
+    
+    
+    
+    
+</html>

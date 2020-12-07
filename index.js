@@ -69,8 +69,7 @@ router.get('/login', async ctx => {
 	console.log('GET login')
 	const acc = await new Account(db) // construct account class
 	try{
-		const header = ctx.request.headers.data
-		const encodedData = header
+		const encodedData = ctx.request.headers.data
 		const loginStatus = await acc.login(encodedData)
 
 		ctx.status = 200
@@ -125,16 +124,17 @@ router.get('/pledge', async ctx => {
     }
 })
 
+router.post('/donate', koaBody, async ctx => {
+    
+})
+
 router.get('/:unix/:value', async ctx => {
     ctx.hbs.title = ctx.params.value
 	await ctx.render('pledge', ctx.hbs)
 })
 
-router.get('/:unix/:value/pledge', async ctx => {
-	//console.log(ctx.params.value)
-	//ctx.hbs.id = ctx.params.id
+router.get('/:unix/:value/donate', async ctx => {
 	await ctx.render('donate', ctx.hbs)
-
 })
 
 

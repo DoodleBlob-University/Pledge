@@ -4,16 +4,23 @@ import { loadCookie, mainEventListeners, drawImageScaled } from '../assets/js/fu
 var loggedin
 
 window.addEventListener('DOMContentLoaded', async event => {
+    var finishedStatus = false
 	mainEventListeners()
 	loggedin = loadCookie('pledgeuser')
     await load(event)
+    
+    document.getElementById("donatebtn").addEventListener("click", () => {
+        if( loggedin && !finishedStatus ){
+            window.location.href = `${window.location.protocol}//${window.location.host}${window.location.pathname}/donate`
+        }
+    })
 })
 
-async function load() {
+async function load(event, finishedStatus) {
     try {
         var unixTitle = window.location.pathname.substring(1).split("/").join("-")
         var pledgeData = await getPledge(unixTitle)
-        let finishedStatus = await displayPledge(pledgeData)
+        finishedStatus = await displayPledge(pledgeData)
         if( finishedStatus === true ){ // if pledge is fully funded/deadline has passed
             const box = document.getElementById("notif")
             notif.innerHTML = "Pledge Finished"
@@ -26,7 +33,7 @@ async function load() {
         
     } catch (error) {
         console.log(error)
-        //window.location.href = "/#404"
+        window.location.href = "/#404"
     }
 }
 
