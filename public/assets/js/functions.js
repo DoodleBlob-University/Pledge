@@ -1,9 +1,18 @@
 /* --- Login --- */
 
-export function encodeUserPass(user, pass) {
-	const userpass = `${user}:${pass}`
-	// encode user and password in base64
-	const encode = btoa(userpass)
+export function encodeData() {
+    // encode data from x amount of arguments
+    const args = Array.from(arguments)
+    let data
+    if( args.length === 1 ){
+        data = args[0]
+    } else if ( args.length === 0 ){
+        throw new Error("No arguments in encodeData()")
+    } else {
+        data = args.join(":")
+    }
+	// encode args in base64
+	const encode = btoa(data)
 	console.log(encode)
 	return encode
 }

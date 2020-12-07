@@ -38,27 +38,27 @@
                     <div class="text">
                         <h1>Donate to <span id=pledgetitle>Pledge</span></h1>
          
-                        <form>
+                        <form class="form" id="donation">
                             <div id="boxes" class="boxes">
                                 <p>Choose an amount to donate</p>
                             <span class="money">
-                                <input type="checkbox" class="moneybox" value="1" name="10">£10
+                                <input type="checkbox" class="moneybox" value="10" name="amount">£10
                             </span>
-                            <label class="money">
-                                <input type="checkbox" class="moneybox" value="1" name="20">£20
-                            </label>
-                            <label class="money">
-                                <input type="checkbox" class="moneybox" value="1" name="50">£50
-                            </label>
-                            <label class="money">
-                                <input type="checkbox" class="moneybox" value="1" name="100">£100
-                            </label>
-                            <label class="money">
-                                <input type="checkbox" class="moneybox" value="1" name="200">£200
-                            </label>
-                            <label class="money">
-                                <input type="checkbox" class="moneybox" value="1" name="500">£500
-                            </label>
+                            <span class="money">
+                                <input type="checkbox" class="moneybox" value="20" name="amount">£20
+                            </span>
+                            <span class="money">
+                                <input type="checkbox" class="moneybox" value="50" name="amount">£50
+                            </span>
+                            <span class="money">
+                                <input type="checkbox" class="moneybox" value="100" name="amount">£100
+                            </span>
+                            <span class="money">
+                                <input type="checkbox" class="moneybox" value="200" name="amount">£200
+                            </span>
+                            <span class="money">
+                                <input type="checkbox" class="moneybox" value="500" name="amount">£500
+                            </span>
                             </div>
                             <script>
                                 // only allow one checkbox to be checked
@@ -66,18 +66,27 @@
                                     let anySelected = false
                                     document.getElementById("paymentdetails").style.display = "none"
                                     for( let box of document.getElementsByClassName("moneybox")){
-                                        if( box.name != ev.target.name ){
+                                        if( box.value != ev.target.value ){
                                             box.checked = false
-                                        } else if (box.name === ev.target.name && box.checked === true){
+                                        } else if (box.value === ev.target.value && box.checked === true){
                                             anySelected = true
                                         }
                                     }
-                                    if(anySelected) document.getElementById("paymentdetails").style.display = "block"
+                                    if(anySelected){
+                                        document.getElementById("paymentdetails").style.display = "block"
+                                    }
                                 }
                             </script>
-                            <div id="paymentdetails" class="paymentdetails" style="display:none;">
-                                test
-                            
+                            <div id="paymentdetails" class="paymentdetails" style="display:none">
+                                <input type="text" name="cc-number" placeholder="Card Number" style="width:17ch;">
+                                <input type="text" name="cvc" placeholder="CVC" style="width:4ch;">
+                                <br>
+                                <input type="text" name="ccname" placeholder="Name on Card" style="width:20ch;">
+                                <input type="text" name="cc-exp" placeholder="Expiry" style="width:6ch;">
+                                <br><br>
+                                <span id="error"><div id="errmsg">Error message</div></span>
+                                <button id="submit">Submit Donation</button><br>
+                                <button id="submitfail" style="font-size:10px;background-color:#FF7F7F;">Fake Payment Failure</button>
                             </div>
                         </form>
                         

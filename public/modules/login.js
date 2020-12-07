@@ -1,4 +1,4 @@
-import { emptyFields, encodeUserPass, createCookie } from '../assets/js/functions.js'
+import { emptyFields, encodeData, createCookie } from '../assets/js/functions.js'
 
 export function setup() {
 	// todo check cookie to see if already logged in
@@ -16,7 +16,7 @@ async function login() {
 
 		if( emptyFields(data) ) throw 'Not all fields are filled'
 
-		const encodedData = encodeUserPass( data.username, data.password )
+		const encodedData = encodeData( data.username, data.password )
 		// get login data
 		const options = { headers: { data: encodedData } }
 		const response = await fetch('/login', options)

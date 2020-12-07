@@ -418,3 +418,13 @@ input[type=number] {
     padding-right: 5px;
     border-radius: 3px;
 }
+
+.paymentdetails {
+    background-color: #edf1f5;
+    margin-top: 20px;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.paymentdetails #input
