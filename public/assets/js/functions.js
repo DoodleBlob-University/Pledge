@@ -1,7 +1,4 @@
-export function emptyFields(object) {
-	// check if all object values are filled
-	return !Object.values(object).every( x => x !== null && x !== '')
-}
+/* --- Login --- */
 
 export function encodeUserPass(user, pass) {
 	const userpass = `${user}:${pass}`
@@ -11,7 +8,7 @@ export function encodeUserPass(user, pass) {
 	return encode
 }
 
-/* --- cookies --- */
+/* --- Cookies --- */
 // from plainjs.com
 export function createCookie(key, value, days) {
 	const expire = new Date() //cookie expiration
@@ -29,7 +26,7 @@ export function deleteCookie(name) {
 	createCookie(name, '', -1)
 }
 
-/* --- canvas --- */
+/* --- Canvas --- */
 
 export function previewImage(input) {
 	const ctx = document.getElementById('canvas').getContext('2d')
@@ -65,7 +62,8 @@ export function drawImageScaled(img, ctx) {
 }
 
 
-/* --- main --- */
+/* --- Main --- */
+
 export function loadCookie(name) {
     var loggedin = false
 	try{
@@ -75,7 +73,7 @@ export function loadCookie(name) {
 		document.getElementById('dropdownTitle').innerHTML = json.username
 		if( json.admin !== 0 ) document.getElementById('adminbtn').style.display = 'block'
 		document.getElementById('logoutbtn').style.display = 'block'
-        loggedin = true
+        loggedin = { user: json.username, admin: json.admin }
 	} catch {
 		// no cookie :(
 		document.getElementById('loginbtn').style.display = 'block'
@@ -106,4 +104,40 @@ export function mainEventListeners() {
 		document.body.scrollTop = 0 // Safari
 		document.documentElement.scrollTop = 0 // Chrome, Firefox, IE, Opera
 	})
+}
+
+export function emptyFields(object) {
+	// check if all object values are filled
+	return !Object.values(object).every( x => x !== null && x !== '')
+}
+
+/* --- Pledges --- */
+
+export async function getPledge(unixTitle){
+    const options = { headers: { unixTitle: unixTitle } }
+    const response = await fetch('/pledge', options)
+    const json = await response.json()
+     
+    if( response.status !== 200 ) throw json.msg // if not successful throw error    
+    return json.data // return json
+}
+
+export async function checkPledgeFinished(pledgeData){
+    if(pledgeData.approved === 0) {
+        return "Pledge awaiting Admin Approval"
+    } else if( pledgeData.moneyRaised >= pledgeData.moneyTarget ||
+      ( new Date().getTime() / 1000 | 0 ) >= pledgeData.deadline ) {
+        return "Pledge Finished"
+    }
+    return false
+}
+
+/* --- Donations --- */
+
+export function checkDonateable(finished, loggedin, creator){
+    // if user is admin or creator, they can donate
+    if( Boolean(finished) == true && !loggedin.admin && loggedin.user != creator ){
+        return false
+    }
+    return true
 }

@@ -36,7 +36,52 @@
             <div class="feed">
                 <div class="content" style="min-width:840px;max-width:840px;margin:15px auto 0;">
                     <div class="text">
-
+                        <h1>Donate to <span id=pledgetitle>Pledge</span></h1>
+         
+                        <form>
+                            <div id="boxes" class="boxes">
+                                <p>Choose an amount to donate</p>
+                            <span class="money">
+                                <input type="checkbox" class="moneybox" value="1" name="10">£10
+                            </span>
+                            <label class="money">
+                                <input type="checkbox" class="moneybox" value="1" name="20">£20
+                            </label>
+                            <label class="money">
+                                <input type="checkbox" class="moneybox" value="1" name="50">£50
+                            </label>
+                            <label class="money">
+                                <input type="checkbox" class="moneybox" value="1" name="100">£100
+                            </label>
+                            <label class="money">
+                                <input type="checkbox" class="moneybox" value="1" name="200">£200
+                            </label>
+                            <label class="money">
+                                <input type="checkbox" class="moneybox" value="1" name="500">£500
+                            </label>
+                            </div>
+                            <script>
+                                // only allow one checkbox to be checked
+                                document.querySelector("#boxes").onclick = function(ev) {
+                                    let anySelected = false
+                                    document.getElementById("paymentdetails").style.display = "none"
+                                    for( let box of document.getElementsByClassName("moneybox")){
+                                        if( box.name != ev.target.name ){
+                                            box.checked = false
+                                        } else if (box.name === ev.target.name && box.checked === true){
+                                            anySelected = true
+                                        }
+                                    }
+                                    if(anySelected) document.getElementById("paymentdetails").style.display = "block"
+                                }
+                            </script>
+                            <div id="paymentdetails" class="paymentdetails" style="display:none;">
+                                test
+                            
+                            </div>
+                        </form>
+                        
+                      
                     </div>
                 </div>
             </div>
@@ -56,8 +101,7 @@
         <footer>
         </footer>
     </body>
-    
-    
+ 
     
     
     
