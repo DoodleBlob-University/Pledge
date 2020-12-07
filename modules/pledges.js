@@ -83,13 +83,9 @@ ${long}, ${lat}, '${body.creator}', 0);`
         var result = await this.db.get(sql)
         if( result.count === 1 ){
             // get pledge data
-            sql = `SELECT pledges.*, SUM(donations.amount) AS moneyRaised FROM pledges INNER JOIN donations ON pledges.id = donations.pledgeId WHERE pledges.image LIKE '${unixTitle}.%';`
+            sql = `SELECT pledges.*, SUM(donations.amount) AS moneyRaised FROM pledges LEFT JOIN donations ON pledges.id = donations.pledgeId WHERE pledges.image LIKE '${unixTitle}.%';`
             const data = await this.db.get(sql)
-            // get list of people who donated
-            // TODO
-            /*
-SELECT *, SUM(donations.amount) AS moneyRaised FROM pledges INNER JOIN donations ON pledges.id = donations.pledgeId WHERE pledges.image LIKE '1607323229419-London-Marathon-2021.%';
-             */
+          
             return data // return pledge data
         }
         throw new Error("Could not find Pledge in db")

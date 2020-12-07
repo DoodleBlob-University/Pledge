@@ -19,29 +19,26 @@ FOREIGN KEY(pledgeId) REFERENCES pledges(id));"
     }
     
     async donate(encodedData, username){
-        try {
-            const data = Buffer.from(encodedData, "base64").toString() // decode
-            const [ pledgeid, amount, ccnumber, cvc, ccname, ccexp ] = data.split(":")
-            // add donation to database
-            let sql = `INSERT INTO donations(amount, user, pledgeId) VALUES (\
+        
+        const data = Buffer.from(encodedData, "base64").toString() // decode
+        const [ pledgeid, amount, ccnumber, cvc, ccname, ccexp ] = data.split(":")
+        // add donation to database
+        let sql = `INSERT INTO donations(amount, user, pledgeId) VALUES (\
 ${amount}, '${username}', ${pledgeid});`
-            let result = await this.db.run(sql)
-            console.log(result)
-            const donationId = result.lastID
-            
-            try {
-                await this.tryPayment(arguments)
-            } catch (error) {
-                // delete donation from database
-                // its in this order, incase payment was to go through but database fail
-                let sql = `DELETE FROM donations WHERE id = ${donationId};`
-                await this.db.run(sql)
-                throw error // throw previous payment error
-            }
-                        
+        let result = await this.db.run(sql)
+        console.log(result)
+        const donationId = result.lastID
+
+        try {
+            await this.tryPayment(arguments)
         } catch (error) {
-            throw error
+            // delete donation from database
+            // its in this order, incase payment was to go through but database fail
+            let sql = `DELETE FROM donations WHERE id = ${donationId};`
+            await this.db.run(sql)
+            throw error // throw previous payment error
         }
+                        
     }
     
     async tryPayment(args){
@@ -62,8 +59,10 @@ ${amount}, '${username}', ${pledgeid});`
         return true
     }
     
-    async getDonations(){
-        
+    async getDonations(pledgeId){
+        let sql = `SELECT user, amount FROM donations WHERE pledgeId = ${pledgeId} ORDER BY id DESC;`
+        const data = await this.db.all(sql)
+        return data
     }
     
 }

@@ -148,6 +148,21 @@ router.get('/donate', async ctx => {
     }
 })
 
+router.get("/donations", async ctx => {
+    console.log("GET donations")
+    const don = await new Donation(db)
+    try {
+        const pledgeId = ctx.request.headers.id
+        const data = await don.getDonations(pledgeId)
+        ctx.status = 200
+        ctx.body = { status: "success", data: data }
+        
+    } catch (error) {
+        ctx.status = 401
+        ctx.body = { status: 'error', msg: error.message }
+    }
+})
+
 router.get('/:unix/:value', async ctx => {
     ctx.hbs.title = ctx.params.value
 	await ctx.render('pledge', ctx.hbs)
@@ -156,7 +171,6 @@ router.get('/:unix/:value', async ctx => {
 router.get('/:unix/:value/donate', async ctx => {
 	await ctx.render('donate', ctx.hbs)
 })
-
 
 app.use(router.routes())
 module.exports = app.listen(port, () => console.log(`Listening on port: ${port}`))

@@ -7,9 +7,9 @@ var loggedin
 window.addEventListener('DOMContentLoaded', async event => {
 	mainEventListeners()
     loggedin = loadCookie('pledgeuser')
-    const pledgeId = await load(event)
+    const pledgeData = await load(event)
 
-    document.querySelector("form").addEventListener("submit", async event => await donate(event, pledgeId))
+    document.querySelector("form").addEventListener("submit", async event => await donate(event, pledgeData))
     
     document.querySelector('main').style.display = 'block' // shows main html
     document.getElementById('loading').style.display = 'none' // hides loading dots
@@ -18,7 +18,7 @@ window.addEventListener('DOMContentLoaded', async event => {
 async function load() {
     try {
         let unixTitleDonate = window.location.pathname.substring(1).split("/").join("-")
-        let unixTitle = unixTitleDonate.substring(0, unixTitleDonate.lastIndexOf("-"))
+        var unixTitle = unixTitleDonate.substring(0, unixTitleDonate.lastIndexOf("-"))
         var pledgeData = await getPledge(unixTitle)
         let finished = await checkPledgeFinished(pledgeData)
         document.getElementById("urltitle").innerHTML = pledgeData.title
@@ -31,7 +31,7 @@ async function load() {
                 window.location.pathname.lastIndexOf("/"))}` // go back pledge page 
         }
  
-        return pledgeData.id
+        return pledgeData
         
     } catch (error) {
         console.log(error)
@@ -43,7 +43,7 @@ async function displayDonate(pledgeData){
     document.getElementById("pledgetitle").innerHTML = pledgeData.title
 }
 
-async function donate(event, id){
+async function donate(event, pledgeData){
     event.preventDefault() // stops standard html form submission
     document.getElementById('error').style.display = 'none' // hide error message box
     // disable submit buttons
@@ -54,12 +54,12 @@ async function donate(event, id){
                 
         const form = document.getElementById("donation")
 		const data = Object.fromEntries(new FormData(form).entries())
-        console.log(data)
         
         // todo check input fields
         
         // get encoded data
-        const cardCred = encodeData(id, data.amount, data.ccnumber, data.cvc, data.ccname, data.ccexp)
+        const cardCred = encodeData(pledgeData.id, data.amount, data.ccnumber, 
+            data.cvc, data.ccname, data.ccexp)
         const userCred = JSON.parse(getCookie("pledgeuser")).encodedData
         
         const options = { headers: { cc: cardCred, usr: userCred, fail: fail } }
@@ -69,6 +69,9 @@ async function donate(event, id){
         if( response.status === 200 ) {
             // success
             console.log(json)
+            const pledgeUrl = 
+            window.location.href = `${window.location.pathname.substring(0,
+                                    window.location.pathname.lastIndexOf("/"))}?${data.amount}`
             
         } else if ( response.status === 401 ){
             // failure
