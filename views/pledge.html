@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title><%= title.replace('-', ' ') %></title>
+        <title id="urltitle">. . .</title>
         <link rel="stylesheet" href="<%= host + '/style.css' %>">
         <link rel="icon" type="image/png" href="<%= host + '/assets/images/PledgeLogo.png' %>" />
         <script type="module" src="<%= host + '/modules/pledge.js' %>"></script>
@@ -34,9 +34,43 @@
         
         <main style="display:none;">
             <div class="feed">
-                <div class="content">
+                <div class="content" style="min-width:840px;max-width:840px;margin:15px auto 0;">
                     <div class="text">
-                        test
+                        <div class="titlebox">
+                            <span class="pledgetitle"><h1 id="pledgetitle" style="display:inline-block;">Pledge Name</h1></span>
+                            <span style="font-size:14px;">by <b><span id="creator">user</span></b></span>
+                        </div>
+                        <canvas id="canvas" width="800" height="250" style="position:relative;"></canvas>
+                        
+                        <span style="display:flex;justify-content:center;align-items:center;margin-top:5px;">
+                            <div class="timeremaining">&#128197; <b><span id="daysremaining">10</span></b> days remaining</div>
+                        </span>
+                    
+                        <div class="targetcontainer" style="margin-top:10px;text-align:center;">
+                            <div class="fundingwrap" style="font-size:20px;">
+                                £<b><span id="raised" style="font-size: 60px;">100</span></b>/<span id="goal">1000</span>
+                            </div>
+                            <div class="progressbar">
+                                <div id="progressbar" class="progress"></div>
+                            </div>
+                            
+                            <div class="donators">
+                            
+                            </div>
+                            
+                        </div>
+                        
+                        <div id="description" class="description">
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla molestie tempus arcu sed pharetra. Aliquam condimentum ultrices ipsum, scelerisque tincidunt nunc volutpat id. Nunc eu ex ut nisl ullamcorper vestibulum sed eget leo. In sapien eros, ullamcorper a commodo eget, auctor sit amet lacus. Mauris risus justo, placerat ut placerat in, feugiat id tortor. Vivamus interdum, eros quis lacinia convallis, nunc nunc mollis enim, hendrerit egestas sapien turpis vitae mauris. Vestibulum hendrerit justo a eleifend vestibulum.
+                            
+Duis et sem rutrum, viverra ex ullamcorper, rhoncus ipsum. Nunc ac condimentum odio. Nam pharetra magna odio, viverra laoreet nisl porta non. Praesent a enim sit amet ipsum cursus ultrices vel at urna. In sodales scelerisque lacinia. Duis vitae aliquam urna. Fusce auctor odio maximus nulla aliquet, ac accumsan augue varius. In sed congue dolor, vel tincidunt nulla. Maecenas a bibendum nulla.
+                        </div>
+                        
+                        <div style="text-align: center;">
+                            <button id="donatebtn" class="donatebtn">
+                                 Donate
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

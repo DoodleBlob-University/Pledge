@@ -26,7 +26,7 @@ const Account = require('./modules/accounts')
 const Pledge = require('./modules/pledges')
 
 async function getHandlebarData(ctx, next) {
-	console.log(`${ctx.method} ${ctx.path}`)
+	//console.log(`${ctx.method} ${ctx.path}`)
 	ctx.hbs = {
 		host: `https://${ctx.host}`
 	}

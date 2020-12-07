@@ -47,9 +47,9 @@ export function previewImage(input) {
 		}
 		const output = URL.createObjectURL( input.files[0] )
 		image.src = output
+        console.log(output)
 	}
 }
-
 
 //https://stackoverflow.com/a/23105310
 export function drawImageScaled(img, ctx) {

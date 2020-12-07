@@ -77,7 +77,7 @@ ${long}, ${lat}, '${body.creator}', 0);`
 
 
 	async getPledge(unixTitle) {
-		let sql = `SELECT COUNT(id) AS count FROM pledges WHERE image LIKE '${unixTitle}%'`
+		let sql = `SELECT COUNT(id) AS count FROM pledges WHERE image LIKE '${unixTitle}.%'`
         var result = await this.db.get(sql)
         if( result.count === 1 ){
             // get pledge data
