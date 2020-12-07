@@ -13,7 +13,6 @@ module.exports = class Account {
 id INTEGER PRIMARY KEY AUTOINCREMENT,\
 title VARCHAR(60) NOT NULL,\
 image BLOB NOT NULL,\
-moneyRaised INTEGER,\
 moneyTarget INTEGER NOT NULL,\
 deadline INTEGER NOT NULL,\
 description VARCHAR(600) NOT NULL,\
@@ -42,9 +41,9 @@ FOREIGN KEY(creator) REFERENCES users(username));'
 			imagename = await this.imageSetup(body, image) // upload img and make path
             
 			// add to database
-			const sql = `INSERT INTO pledges(title, image, moneyRaised, moneyTarget, deadline,\
+			const sql = `INSERT INTO pledges(title, image, moneyTarget, deadline,\
 description, longitude, latitude, creator, approved) VALUES (\
-'${body.pledgename}', '${imagename}', 0, ${body.fundgoal}, ${unixDeadline}, '${body.desc}',\
+'${body.pledgename}', '${imagename}', ${body.fundgoal}, ${unixDeadline}, '${body.desc}',\
 ${long}, ${lat}, '${body.creator}', 0);`
 			await this.db.run(sql)
           
@@ -79,15 +78,18 @@ ${long}, ${lat}, '${body.creator}', 0);`
 
 
 	async getPledge(unixTitle) {
+        //moneyRaised
 		let sql = `SELECT COUNT(id) AS count FROM pledges WHERE image LIKE '${unixTitle}.%'`
         var result = await this.db.get(sql)
         if( result.count === 1 ){
             // get pledge data
-            sql = `SELECT * FROM pledges WHERE image LIKE '${unixTitle}%'`
+            sql = `SELECT pledges.*, SUM(donations.amount) AS moneyRaised FROM pledges INNER JOIN donations ON pledges.id = donations.pledgeId WHERE pledges.image LIKE '${unixTitle}.%';`
             const data = await this.db.get(sql)
             // get list of people who donated
             // TODO
-            
+            /*
+SELECT *, SUM(donations.amount) AS moneyRaised FROM pledges INNER JOIN donations ON pledges.id = donations.pledgeId WHERE pledges.image LIKE '1607323229419-London-Marathon-2021.%';
+             */
             return data // return pledge data
         }
         throw new Error("Could not find Pledge in db")

@@ -136,15 +136,14 @@ router.get('/donate', async ctx => {
         // submit payment
         const encodedCc = ctx.request.headers.cc
         const forcedPaymentFailure = ctx.request.headers.fail
-        const donationStatus = await don.donate(encodedCc, forcedPaymentFailure)
+        const donationStatus = await don.donate(encodedCc, loginStatus.username, forcedPaymentFailure)
         //
         ctx.status = 200
-        ctx.body = { status: 'success', msg: "yes" }
+        ctx.body = { status: 'success', msg: "Donation successful" }
         
     } catch(error) {
-        console.log(error)
         ctx.status = 401
-        ctx.body = { status: 'success', msg: error.msg }
+        ctx.body = { status: 'error', msg: error.message }
         
     }
 })

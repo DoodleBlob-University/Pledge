@@ -6,11 +6,13 @@ var loggedin
 
 window.addEventListener('DOMContentLoaded', async event => {
 	mainEventListeners()
+    loggedin = loadCookie('pledgeuser')
+    const pledgeId = await load(event)
 
-    document.querySelector("form").addEventListener("submit", async event => await donate(event))
+    document.querySelector("form").addEventListener("submit", async event => await donate(event, pledgeId))
     
-	loggedin = loadCookie('pledgeuser')
-    await load(event)
+    document.querySelector('main').style.display = 'block' // shows main html
+    document.getElementById('loading').style.display = 'none' // hides loading dots
 })
 
 async function load() {
@@ -28,9 +30,8 @@ async function load() {
             window.location.href = `${window.location.pathname.substring(0,
                 window.location.pathname.lastIndexOf("/"))}` // go back pledge page 
         }
-        
-        document.querySelector('main').style.display = 'block' // shows main html
-        document.getElementById('loading').style.display = 'none' // hides loading dots
+ 
+        return pledgeData.id
         
     } catch (error) {
         console.log(error)
@@ -42,7 +43,7 @@ async function displayDonate(pledgeData){
     document.getElementById("pledgetitle").innerHTML = pledgeData.title
 }
 
-async function donate(event){
+async function donate(event, id){
     event.preventDefault() // stops standard html form submission
     document.getElementById('error').style.display = 'none' // hide error message box
     // disable submit buttons
@@ -58,7 +59,7 @@ async function donate(event){
         // todo check input fields
         
         // get encoded data
-        const cardCred = encodeData(data.amount, data.ccnumber, data.cvc, data.ccname, data.ccexp)
+        const cardCred = encodeData(id, data.amount, data.ccnumber, data.cvc, data.ccname, data.ccexp)
         const userCred = JSON.parse(getCookie("pledgeuser")).encodedData
         
         const options = { headers: { cc: cardCred, usr: userCred, fail: fail } }

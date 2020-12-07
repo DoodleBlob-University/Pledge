@@ -20,7 +20,6 @@ CREATE TABLE IF NOT EXISTS pledges(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title VARCHAR(60) NOT NULL,
     image BLOB NOT NULL,
-    moneyRaised INTEGER,
     moneyTarget INTEGER NOT NULL,
     deadline INTEGER NOT NULL,
     description VARCHAR(600) NOT NULL,
@@ -35,3 +34,12 @@ INSERT INTO pledges(title, image, moneyRaised, moneyTarget, deadline, descriptio
     longitude, latitude, creator, approved) 
     VALUES ('${body.pledgename}', '${imagename}', 0, ${body.fundgoal}, ${body.deadline}, '${body.desc}',
     ${long}, ${lat}, '${body.creator}', 0);
+    
+CREATE TABLE IF NOT EXISTS donations(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    amount INTEGER NOT NULL,
+    user VARCHAR(30) NOT NULL,
+    pledgeId INTEGER NOT NULL,
+    FOREIGN KEY(user) REFERENCES users(username),
+    FOREIGN KEY(pledgeId) REFERENCES pledges(id)
+);
