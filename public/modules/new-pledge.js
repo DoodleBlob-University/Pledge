@@ -35,7 +35,7 @@ async function submitPledge(event) {
 		if( response.status === 201 ) {
 			// success
 			window.alert(json.msg) //alert user that pledge was created
-			// TODO: redirect to pledge page
+			window.location.href = json.url
 
 		}else if( response.status === 422) {
 			// error in creating account

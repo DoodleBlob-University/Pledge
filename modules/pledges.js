@@ -40,17 +40,18 @@ FOREIGN KEY(creator) REFERENCES users(username));'
 			const unixDeadline = new Date(body.deadline).getTime() / 1000
 
 			imagename = await this.imageSetup(body, image) // upload img and make path
-
+            
 			// add to database
 			const sql = `INSERT INTO pledges(title, image, moneyRaised, moneyTarget, deadline,\
 description, longitude, latitude, creator, approved) VALUES (\
 '${body.pledgename}', '${imagename}', 0, ${body.fundgoal}, ${unixDeadline}, '${body.desc}',\
 ${long}, ${lat}, '${body.creator}', 0);`
 			await this.db.run(sql)
-
+          
 			// returns url for pledge
 			const unix = imagename.substr(0,imagename.indexOf('-'))
-			const name = imagename.substr(imagename.indexOf('-')+1)
+			const imgname = imagename.substr(imagename.indexOf('-')+1)
+            const name = imgname.substr(0, imgname.lastIndexOf('.'))
 			return `${unix}/${name}`
 
 		} catch (error) {

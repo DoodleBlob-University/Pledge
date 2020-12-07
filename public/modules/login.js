@@ -39,8 +39,8 @@ async function login() {
 			encodedData: encodedData,
 			admin: json.admin }, 1) )
 		//console.log ( getCookie("pledgeuser") );
-		window.location.href = '/'
-
+		//window.location.href = '/'
+        window.location=document.referrer; // go to previous page 
 
 	} catch (error) {
 		const errorBox = document.getElementById('error') // display error
