@@ -24,7 +24,7 @@ async function load() {
 		document.getElementById('urltitle').innerHTML = pledgeData.title
 		await displayDonate(pledgeData)
 
-		if( !checkDonateable(finished, loggedin, pledgeData.creator) ) {
+		if( !checkDonateable(finished, pledgeData.approved) ) {
 			// if not donateable
 			window.alert(finished)
 			window.location.href = `${window.location.pathname.substring(0,

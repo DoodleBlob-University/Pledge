@@ -158,13 +158,16 @@ router.get('/approval', async ctx => {
 	console.log(ctx)
 })
 
+/* --- renders --- */
+
 router.get('/:unix/:value', async ctx => {
-	ctx.hbs.title = ctx.params.value
 	await ctx.render('pledge', ctx.hbs)
 })
 
 router.get('/:unix/:value/donate', async ctx => {
 	await ctx.render('donate', ctx.hbs)
 })
+
+/* --------------- */
 
 module.exports = router

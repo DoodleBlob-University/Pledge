@@ -1,5 +1,5 @@
 //
-import { loadCookie, mainEventListeners, drawImageScaled,
+import { getCookie, loadCookie, mainEventListeners, drawImageScaled,
 	getPledge, checkPledgeFinished, checkDonateable } from '../assets/js/functions.js'
 
 let loggedin
@@ -37,13 +37,25 @@ async function load(event, finishedStatus) {
 			document.getElementById('thanks').style.display = 'block'
 			window.history.replaceState({}, document.title, window.location.pathname)
 		}
+        
+        // displays admin panel if user is admin and pledge has not been approved
+        if( loggedin && JSON.parse(getCookie("pledgeuser")).admin && pledgeData.approved === 0 ){
+            document.getElementById("adminpanel").style.display="block"
+            //set up listeners for admin panel buttons
+            document.querySelectorAll("#adminpanel button").forEach(btn =>
+                btn.onclick = () => {
+                // send details to server
+                
+                
+            })
+        }
 
 		document.querySelector('main').style.display = 'block' // shows main html
 		document.getElementById('loading').style.display = 'none' // hides loading dots
 
 	} catch (error) {
 		console.log(error)
-		window.location.href = '/#404'
+		//window.location.href = '/#404'
 	}
 }
 
@@ -98,14 +110,20 @@ async function displayPledge(pledgeData, finished) {
 
 	//check finished status
 	// if user pledge is not donateable
-	if( !checkDonateable(finished, loggedin, pledgeData.creator) ) {
-		document.getElementById('notif').innerHTML = finished
-		if( finished.includes('Admin') ) { // if requires admin approval
-			document.getElementById('notif').style.backgroundColor = 'yellow'
-		}else{ // otherwise pledge finished
-			document.getElementById('notif').style.backgroundColor = '#30FFb7'
-		}
-		document.getElementById('donatebtn').style.display = 'none'
+	if( !checkDonateable(finished, pledgeData.approved) ) {
+        // displays pledge is finished
+        
+        if( loggedin && JSON.parse(getCookie("pledgeuser")).admin ) { // do not change if admin
+        } else if( pledgeData.approved === 0 && !finished ){
+            // if pledge not approved
+            document.getElementById('notif').innerHTML = "Awaiting Admin Approval"
+            document.getElementById('notif').style.backgroundColor = 'yellow'
+        } else { 
+            // if pledge has finished
+            document.getElementById('notif').innerHTML = "This Pledge has finished"
+            document.getElementById('notif').style.backgroundColor = '#30FFb7'
+        }
+        document.getElementById('donatebtn').style.display = 'none'
 	}
 }
 /* eslint-enable max-statements, complexity, max-lines-per-function */

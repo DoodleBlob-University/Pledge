@@ -130,9 +130,7 @@ export async function getPledge(unixTitle) {
 }
 
 export async function checkPledgeFinished(pledgeData) {
-	if(pledgeData.approved === 0) {
-		return 'Pledge awaiting Admin Approval'
-	} else if( pledgeData.moneyRaised >= pledgeData.moneyTarget ||
+	if( pledgeData.moneyRaised >= pledgeData.moneyTarget ||
       ( new Date().getTime() / 1000 | 0 ) >= pledgeData.deadline ) {
 		return 'Pledge Finished'
 	}
@@ -141,9 +139,9 @@ export async function checkPledgeFinished(pledgeData) {
 
 /* --- Donations --- */
 
-export function checkDonateable(finished, loggedin, creator) {
+export function checkDonateable(finished, approved) {
 	// if user is admin or creator, they can donate
-	if( Boolean(finished) === true && !loggedin.admin && loggedin.user !== creator ) {
+	if( Boolean(finished) === true || approved === 0) {
 		return false
 	}
 	return true

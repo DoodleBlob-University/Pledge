@@ -65,7 +65,6 @@ async function asyncGetPledges() {
 				return 0
 			}
 		})()
-		console.log(admin)
 
 		const options = { headers: { fin: fin, off: offset, admin: admin } }
 		const response = await fetch('/list', options)
@@ -94,7 +93,6 @@ async function asyncGetPledges() {
 async function displayPledges(data) {
 	data.forEach( p => {
 		p.moneyRaised = p.moneyRaised === null ? 0 : p.moneyRaised
-		console.log(p)
 
 		const url = getURLfromImgName(p.image)
 		const daysRemaining = getDaysRemaining(p.deadline)
@@ -102,18 +100,25 @@ async function displayPledges(data) {
 		const finished = daysRemaining <= 0 || p.moneyRaised >= p.moneyTarget ? true : false
 		const approved = p.approved
 
-		const htmlStr = makePledgeHTML(url, approved, p.title, p.creator, daysRemaining,
-			p.moneyRaised, p.moneyTarget, progressWidth, finished)
+		const htmlStr = makePledgeHTML({url:url, approved:approved, title:p.title, 
+                                        creator:p.creator, daysRemaining:daysRemaining,
+                                        moneyRaised:p.moneyRaised, moneyTarget:p.moneyTarget, 
+                                        progressWidth:progressWidth, finished:finished})
 
 		const pledgeDiv = document.getElementById('pledges')
 		const mList = document.createElement('div')
 		mList.setAttribute('id', 'mainlist')
 		pledgeDiv.appendChild(mList)
+        
+        // set position as beforebegin if not yet approved
+        // set position as beforeend if not finished
+        // set position as afterend if finished
+        const pos = !p.approved ? "beforebegin" : ( finished ? "afterend" : "beforeend" )
 
-		// insert html into created attribute, unless pledge is finished
-		document.getElementById('mainlist').insertAdjacentHTML(
-			finished ? 'afterend' : 'beforeend', htmlStr)
+		// insert html into created attribute, unless pledge is finished or awiting approval
+		document.getElementById('mainlist').insertAdjacentHTML(pos, htmlStr)
 		// finished pledges are inserted outside the created element, so they appear at the bottom
+        // pledges awaiting for approval are inserted above
 	})
 
 }
@@ -135,36 +140,36 @@ function getProgressBarSize(raised, target) {
 	return percent
 }
 
-/* eslint-disable max-lines-per-function, max-len, max-params */
-function makePledgeHTML(url, approved, title, creator, daysRemaining, moneyRaised, moneyTarget, width, finished) {
+/* eslint-disable max-lines-per-function, max-len */
+function makePledgeHTML(j) {
 	let htmlStr =`
-    <div class="content" onclick="${url}" style="cursor: pointer;" onmouseover="">
+    <div class="content" onclick="${j.url}" style="cursor: pointer;" onmouseover="">
       <div class="text" style="padding-top:5px;">
           <div class="titlebox" style="">
-              <span class="pledgetitle"><h3 id="pledgetitle" style="display:inline-block;">${title}</h3>
-                  <span style="font-size:14px;margin-left:10px;"><span id="creator">${creator}</span></span></span>
+              <span class="pledgetitle"><h3 id="pledgetitle" style="display:inline-block;">${j.title}</h3>
+                  <span style="font-size:14px;margin-left:10px;"><span id="creator">${j.creator}</span></span></span>
               <span style="display:flex;justify-content:center;align-items:center;margin-top:5px;">`
-	if( !approved ) {
+	if( !j.approved ) {
 		htmlStr += '<div id="notif" class="timeremaining" style="font-size:13px;background-color:yellow;">Awaiting Approval</div>'
-	} else if( finished ) {
+	} else if( j.finished ) {
 		htmlStr += '<div id="notif" class="timeremaining" style="font-size:13px;background-color:#30FFB7">Pledge Finished</div>'
 	} else {
-		htmlStr += `<div id="notif" class="timeremaining" style="font-size:13px;">&#128197; <b><span id="daysremaining">${daysRemaining | 0}</span></b> days remaining</div>`
+		htmlStr += `<div id="notif" class="timeremaining" style="font-size:13px;">&#128197; <b><span id="daysremaining">${j.daysRemaining | 0}</span></b> days remaining</div>`
 	}
 	htmlStr += `</span>
           </div>
           <div class="progressbar" style="border-radius:5px;height:15px;display:flex;width:100%;margin: 0 auto;">
               <div id="progressbar" class="progress"
-                    style="border-radius:5px;height:15px;font-size:13px;display:block;width:${width}%;" >
+                    style="border-radius:5px;height:15px;font-size:13px;display:block;width:${j.width}%;" >
               </div>
           </div>
-          <div style="font-size:10px;text-align:center;">£${moneyRaised}/${moneyTarget}</div>
+          <div style="font-size:10px;text-align:center;">£${j.moneyRaised}/${j.moneyTarget}</div>
       </div>
   </div>
 `
 	return htmlStr
 }
-/* eslint-enable max-lines-per-function, max-len, max-params */
+/* eslint-enable max-lines-per-function, max-len */
 
 
 async function displayError(error) {

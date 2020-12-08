@@ -427,3 +427,29 @@ input[type=number] {
     border-radius: 10px;
     text-align: center;
 }
+
+/* -- admin -- */
+.adminpanel {
+    margin-top: 20px;
+}
+
+.adminpanel span button {
+    font-weight: bold;
+    border: none;
+    display: inline-block;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.adminpanel span button#y {
+    background-color: #30FFB7;
+    margin-right: 50px; 
+}
+
+.adminpanel span button#n {
+    background-color: #FF7F7F;
+}
+
+.adminpanel span button:hover {
+    opacity: 0.8;
+}
