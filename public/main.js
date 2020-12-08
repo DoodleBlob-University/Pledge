@@ -17,7 +17,7 @@ async function load() {
 	try {
 		// page equals string after # or if none, 'home'
 		const page = location.hash.length > 1 ? location.hash.substring(1) : 'home'
-		console.log( `${location.host }/${ location.hash}`)
+		//console.log( `${location.host }/${ location.hash}`)
 		// load html and js
 		document.querySelector('main').innerHTML = await
 		( await fetch(`./views/${ page }.html`) ).text() // inject html into <main> of index

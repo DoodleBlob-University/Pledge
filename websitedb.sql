@@ -43,3 +43,5 @@ CREATE TABLE IF NOT EXISTS donations(
     FOREIGN KEY(user) REFERENCES users(username),
     FOREIGN KEY(pledgeId) REFERENCES pledges(id)
 );
+
+select p.title, p.creator, p.deadline, d.moneyRaised, p.moneyTarget, p.image from pledges as p left join ( select pledgeId, sum(amount) as moneyRaised from donations group by pledgeId ) as d on d.pledgeId = p.id limit 2 offset 2;

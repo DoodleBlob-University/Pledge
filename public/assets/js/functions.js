@@ -79,7 +79,6 @@ export function loadCookie(name) {
 		json = JSON.parse( json ) // json string with cookie info
 		// navbar changes for user
 		document.getElementById('dropdownTitle').innerHTML = json.username
-		if( json.admin !== 0 ) document.getElementById('adminbtn').style.display = 'block'
 		document.getElementById('logoutbtn').style.display = 'block'
 		loggedin = { user: json.username, admin: json.admin }
 	} catch {

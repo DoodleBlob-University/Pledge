@@ -20,7 +20,6 @@ longitude INTEGER,\
 latitude INTEGER,\
 creator VARCHAR(30) NOT NULL,\
 approved BOOLEAN NOT NULL CHECK (approved IN (0,1)),\
-PRIMARY KEY(id, image),\
 FOREIGN KEY(creator) REFERENCES users(username));'
 			await this.db.run(sql)
 			return this
@@ -92,10 +91,38 @@ pledges LEFT JOIN donations ON pledges.id = donations.pledgeId WHERE pledges.ima
 		throw new Error('Could not find Pledge in db')
 	}
 
-	async listPledges() {
+	async listPledges(offset, showFinished, admin) {
+		// get list of pledges
+		let sql = `SELECT p.title, p.creator, p.deadline, d.moneyRaised, p.moneyTarget, 
+p.image, p.approved FROM pledges AS p LEFT JOIN ( SELECT pledgeId, 
+SUM(amount) AS moneyRaised FROM donations GROUP BY pledgeId 
+) AS d ON d.pledgeId = p.id `//WHERE p.approved = 1`
+
+		if( admin==='1' ) { // if user is not admin, display only approved listings
+			// is admin
+			if( showFinished === 'false' ) sql += ' WHERE'
+		}else{
+			// is not admin
+			sql += ' WHERE p.approved = 1'
+			if( showFinished === 'false' ) sql += ' AND'
+		}
+
+		if( showFinished === 'false' ) {
+			// do not display finished listings
+			sql += ' deadline > strftime(\'%s\', \'now\') AND ( moneyRaised < moneyTarget OR moneyRaised IS NULL)'
+		}
+		sql += ` ORDER BY deadline LIMIT 20 OFFSET ${20*offset};`
+
+		const data = await this.db.all(sql)
+		return data
+	}
+
+	async approvePledge(id) {
 		//todo
-        
-        
+	}
+
+	async denyPledge(id) {
+		//todo
 	}
 
 	async close() {

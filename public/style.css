@@ -42,6 +42,7 @@ html, body {
 #loading {
     display: none;
     text-align: center;
+    margin-top: 190px;
 }
 
 #loading .dot {
@@ -49,7 +50,6 @@ html, body {
     width: 25px;
     border-radius: 50%;
     display: inline-block;
-    margin-top: 190px;
     margin-left: 15px; 
     margin-right: 15px;
     animation: loading 1s ease-in-out infinite;
@@ -101,6 +101,7 @@ html, body {
     border-bottom: 1px solid #ccc;
     top: 0;
     position: fixed;
+    z-index:99;
 }
 
 .nav .logo {
