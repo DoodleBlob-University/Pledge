@@ -43,9 +43,21 @@ async function load(event, finishedStatus) {
             document.getElementById("adminpanel").style.display="block"
             //set up listeners for admin panel buttons
             document.querySelectorAll("#adminpanel button").forEach(btn =>
-                btn.onclick = () => {
+                btn.onclick = async () => {
+                const cred = JSON.parse(getCookie("pledgeuser")).encodedData
                 // send details to server
-                
+                const options = { headers: { id: pledgeData.id, status: btn.id, usr: cred }}
+                const response = await fetch("/approval", options)
+                const  json = await response.json()
+                if ( response.status === 200 ){
+                    // success 
+                    window.location.reload()
+                } else if ( response.status === 401 ){
+                    // user is not an admin
+                    console.log( json )
+                } else {
+                    console.log( json )
+                }
                 
             })
         }
