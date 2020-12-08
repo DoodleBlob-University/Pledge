@@ -1,7 +1,6 @@
 const sqlite = require('sqlite-async')
 const bcrypt = require('bcrypt-promise')
 
-
 const saltRounds = 7
 
 module.exports = class Account {

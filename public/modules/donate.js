@@ -2,11 +2,9 @@
 import { loadCookie, getCookie, mainEventListeners, getPledge,
 	checkPledgeFinished, checkDonateable, encodeData } from '../assets/js/functions.js'
 
-let loggedin
-
 window.addEventListener('DOMContentLoaded', async event => {
 	mainEventListeners()
-	loggedin = loadCookie('pledgeuser')
+	loadCookie('pledgeuser')
 	const pledgeData = await load(event)
 
 	document.querySelector('form').addEventListener('submit', async event => await donate(event, pledgeData))

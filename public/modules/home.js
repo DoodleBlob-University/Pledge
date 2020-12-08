@@ -100,25 +100,25 @@ async function displayPledges(data) {
 		const finished = daysRemaining <= 0 || p.moneyRaised >= p.moneyTarget ? true : false
 		const approved = p.approved
 
-		const htmlStr = makePledgeHTML({url:url, approved:approved, title:p.title, 
-                                        creator:p.creator, daysRemaining:daysRemaining,
-                                        moneyRaised:p.moneyRaised, moneyTarget:p.moneyTarget, 
-                                        progressWidth:progressWidth, finished:finished})
+		const htmlStr = makePledgeHTML({url: url, approved: approved, title: p.title,
+			creator: p.creator, daysRemaining: daysRemaining,
+			moneyRaised: p.moneyRaised, moneyTarget: p.moneyTarget,
+			progressWidth: progressWidth, finished: finished})
 
 		const pledgeDiv = document.getElementById('pledges')
 		const mList = document.createElement('div')
 		mList.setAttribute('id', 'mainlist')
 		pledgeDiv.appendChild(mList)
-        
-        // set position as beforebegin if not yet approved
-        // set position as beforeend if not finished
-        // set position as afterend if finished
-        const pos = !p.approved ? "beforebegin" : ( finished ? "afterend" : "beforeend" )
+
+		// set position as beforebegin if not yet approved
+		// set position as beforeend if not finished
+		// set position as afterend if finished
+		const pos = !p.approved ? 'beforebegin' : finished ? 'afterend' : 'beforeend'
 
 		// insert html into created attribute, unless pledge is finished or awiting approval
 		document.getElementById('mainlist').insertAdjacentHTML(pos, htmlStr)
 		// finished pledges are inserted outside the created element, so they appear at the bottom
-        // pledges awaiting for approval are inserted above
+		// pledges awaiting for approval are inserted above
 	})
 
 }
@@ -160,7 +160,7 @@ function makePledgeHTML(j) {
           </div>
           <div class="progressbar" style="border-radius:5px;height:15px;display:flex;width:100%;margin: 0 auto;">
               <div id="progressbar" class="progress"
-                    style="border-radius:5px;height:15px;font-size:13px;display:block;width:${j.width}%;" >
+                    style="border-radius:5px;height:15px;font-size:13px;display:block;width:${j.progressWidth}%;" >
               </div>
           </div>
           <div style="font-size:10px;text-align:center;">£${j.moneyRaised}/${j.moneyTarget}</div>

@@ -1,12 +1,12 @@
 const Koa = require('koa')
 const koaStatic = require('koa-static')
+const path = require('path')
+const render = require('koa-ejs')
 
 const router = require('./routes/routes')
 
 const app = new Koa()
 
-const path = require('path')
-const render = require('koa-ejs')
 render(app, {
 	root: path.join(__dirname, 'views'),
 	layout: false,

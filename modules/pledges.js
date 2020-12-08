@@ -118,13 +118,13 @@ SUM(amount) AS moneyRaised FROM donations GROUP BY pledgeId
 	}
 
 	async approvePledge(id) {
-        let sql = `UPDATE pledges SET approved = 1 WHERE id = ${id};`
-        await this.db.run(sql)
+		const sql = `UPDATE pledges SET approved = 1 WHERE id = ${id};`
+		await this.db.run(sql)
 	}
 
 	async denyPledge(id) {
-        let sql = `DELETE FROM pledges WHERE id = ${id};`
-        await this.db.run(sql)
+		const sql = `DELETE FROM pledges WHERE id = ${id};`
+		await this.db.run(sql)
 	}
 
 	async close() {

@@ -100,7 +100,7 @@ router.get('/pledge', async ctx => {
 router.get('/donate', async ctx => {
 	console.log('GET donate')
 	const acc = await new Account(db) // construct account class
-    const plg = await new Pledges(db) // construct account class
+	const plg = await new Pledges(db) // construct account class
 	const don = await new Donation(db) // construct donation class
 	try {
 		// re-login using cookie data
@@ -157,33 +157,33 @@ router.get('/list', async ctx => {
 
 router.get('/approval', async ctx => {
 	console.log('GET approval')
-    const acc = await new Account(db) // construct account class
+	const acc = await new Account(db) // construct account class
 	const plg = await new Pledge(db)
 	try {
 		// re-login using cookie dat
 		const encodedUsr = ctx.request.headers.usr
 		const loginStatus = await acc.login(encodedUsr)
 		// check if user is actually an admin
-		if ( loginStatus.admin ){
-            const id = ctx.request.headers.id
-            const approved = ctx.request.headers.status === "y" ? true : false
-            if ( approved ){
-                await plg.approvePledge(id)
-            } else {
-                await plg.denyPledge(id)
-            }
-            // success
-            ctx.status = 200
-            ctx.body = { status: 'error', msg: 'not an admin' }
-            
-        } else {
-            // user is not admin
-            ctx.status = 401
-            ctx.body = { status: 'error', msg: 'user is not an admin' }
-        }
+		if ( loginStatus.admin ) {
+			const id = ctx.request.headers.id
+			const approved = ctx.request.headers.status === 'y' ? true : false
+			if ( approved ) {
+				await plg.approvePledge(id)
+			} else {
+				await plg.denyPledge(id)
+			}
+			// success
+			ctx.status = 200
+			ctx.body = { status: 'error', msg: 'not an admin' }
+
+		} else {
+			// user is not admin
+			ctx.status = 401
+			ctx.body = { status: 'error', msg: 'user is not an admin' }
+		}
 
 	} catch(error) {
-        // other error
+		// other error
 		ctx.status = 303
 		ctx.body = { status: 'error', msg: error.message }
 	}
