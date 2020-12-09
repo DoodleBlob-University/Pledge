@@ -4,6 +4,11 @@ const ejsRouter = require('./ejs.js')
 const requestRouter = require('./requests.js')
 const publicRouter = require('./public.js')
 
+/*
+ * combines the routes of multiple routers into a single router
+ * @params {Array} takes multiple routers an argument
+ * @returns {Object} combined routes
+ */
 function combineRouters() {
 	const routers = Array.from(arguments)
 	const routes = []

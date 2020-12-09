@@ -3,8 +3,16 @@ const bcrypt = require('bcrypt-promise')
 
 const saltRounds = 7
 
+/**
+ * Account
+ * Module that handles logging in and registration of accounts
+ */
 module.exports = class Account {
 
+	/**
+     * Create account object
+     * @param {String} [dbName=":memory:"] is the name of the database file being used
+     */
 	constructor(dbName = ':memory:') {
 		// create database if not yet existing
 		return (async() => {
@@ -20,7 +28,13 @@ admin BOOLEAN NOT NULL CHECK (admin IN (0,1)));'
 		})()
 	}
 
-	//REGISTER NEW USER
+	/*
+	 * Registers a new user
+	 * @param {String} the users' email address
+	 * @param {String} the users' username
+	 * @param {String} the users' password
+	 * @returns {Boolean} returns true is new user has been added, otherwise throws error
+	 */
 	async register(email, username, password) {
 		// check if any fields are empty
 		await this.registerCheck(email, username, password) // TODO: input checking
@@ -46,6 +60,14 @@ admin BOOLEAN NOT NULL CHECK (admin IN (0,1)));'
 
 	}
 
+	/*
+     * checks if the user inputted correct credentials
+     * if not throws error that alerts the user
+	 * @param {String} the users' email address
+	 * @param {String} the users' username
+	 * @param {String} the users' password
+	 * @returns {Boolean} returns true if user form input is correct otherwise throws error
+	 */
 	async registerCheck(email, username, password) {
 		/*
         if( email.length === 0 || username.length === 0 || password.length === 0) {
@@ -55,7 +77,10 @@ admin BOOLEAN NOT NULL CHECK (admin IN (0,1)));'
 		return true
 	}
 
-	//LOGIN USER
+	/* checks to see if a set of login credentials are valid
+	 * @param {String} base64 encoded string of both the username and password
+	 * @returns {JSON} returns json containing username and if the user is admin on success
+	 */
 	async login(encodedData) {
 		const data = Buffer.from(encodedData, 'base64').toString() // decode
 		const [ username, password ] = data.split(':') // split into password and username

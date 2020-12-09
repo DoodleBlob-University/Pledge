@@ -3,8 +3,16 @@ const sqlite = require('sqlite-async')
 const mime = require('mime-types')
 const fs = require('fs-extra')
 
-module.exports = class Account {
+/*
+ * Pledges
+ * Module handles the creation, viewing and approval of a pledge
+ */
+module.exports = class Pledges {
 
+	/**
+     * Create pledge object
+     * @param {String} [dbName=":memory:"] is the name of the database file being used
+     */
 	constructor(dbName = ':memory:') {
 		// create database if not yet existing
 		return (async() => {
@@ -26,7 +34,12 @@ FOREIGN KEY(creator) REFERENCES users(username));'
 		})()
 	}
 
-	//CREATE NEW PLEDGE
+	/*
+     * Creates a new pledge and adds it to database
+     * @param {JSON} contains all information for the pledge that the user input
+     * @param {File} the image the user selected for the pledge
+     * @returns the URL the pledge can be viewed on, throws error if failed to make pledge
+     */
 	async newpledge(body, image) {
 		let imagename
 		try {
@@ -53,6 +66,15 @@ FOREIGN KEY(creator) REFERENCES users(username));'
 		}
 	}
 
+	/*
+     * Formats SQL to insert pledge into database
+     * @param {JSON} contains all information for the pledge that the user input
+     * @param {String} the path for the image selected by the user, after being saved to filesystem
+     * @param {Integer} the unix time for the pledges' deadline
+     * @param {Integer} longitude of the pledges' location -> currently null as feature not yet implemented
+     * @param {Integer} latitude of the pledges' location -> currently null as feature not yet implemented
+	 * @returns {String} returns sql string ready for executing
+	 */
 	async createNewPledgeSQL(body, img, unix, long, lat) {
 		const sql = `INSERT INTO pledges(title, image, moneyTarget, deadline,
 description, longitude, latitude, creator, approved) VALUES (
@@ -61,6 +83,11 @@ ${long}, ${lat}, '${body.creator}', 0);`
 		return sql
 	}
 
+	/*
+     * generates url for the pledge from the image name (deadline and title)
+     * @param {String} the name of the image file
+     * @returns {String} the URL for the pledge
+     */
 	async createPledgeURL(imagename) {
 		// returns url for pledge
 		const unix = imagename.substr(0,imagename.indexOf('-'))
@@ -69,6 +96,12 @@ ${long}, ${lat}, '${body.creator}', 0);`
 		return `${unix}/${name}`
 	}
 
+	/*
+     * saves the pledge image to the filesystem
+     * @param {JSON} contains all information for the pledge that the user input
+     * @param {File} the image the user selected for the pledge
+     * @returns {String} the name of the saved image
+     */
 	async imageSetup(body, image) {
 		// upload image to filesystem
 		const saveName = `${Date.now()}-${body.pledgename.replace(/\s/g, '-')}.${mime.extension(image.type)}`
@@ -76,12 +109,24 @@ ${long}, ${lat}, '${body.creator}', 0);`
 		return saveName
 	}
 
+	/*
+     * checks if the user inputted the form correctly
+     * if not throws error that alerts the user
+     * @param {JSON} contains all information for the pledge that the user input
+     * @param {File} the image the user selected for the pledge
+	 * @returns {Boolean} returns true if user form input is correct otherwise throws error
+	 */
 	async pledgeCheck(body, image) {
 		// TODO
 		return true
 	}
 
-
+	/*
+     * gets data for a pledge from the imagename
+     * @param {String} the name of the image, without the file extension
+     * @returns {JSON} returns all data for the pledge
+     *                 the calculated value of money raised from the donations table
+     */
 	async getPledge(unixTitle) {
 		//moneyRaised
 		let sql = `SELECT COUNT(id) AS count FROM pledges WHERE image LIKE '${unixTitle}.%'`
@@ -97,6 +142,20 @@ pledges LEFT JOIN donations ON pledges.id = donations.pledgeId WHERE pledges.ima
 		throw new Error('Could not find Pledge in db')
 	}
 
+	/*
+     * gets a list of pledges to display on the home screen
+     * @param {Integer} this multiplied by the numOfPledges is how many pledges are currently
+     *                      displayed on the home screen
+     *                  this allows the user to load additional pledges while scrolling
+     *                  stops long wait time for waiting for all pledges to load at once
+     * @param {String} determines whether the user wants to also display finished pledges
+     *                 was originally a boolean but now treated as a string after the sending
+     *                     in the GET request
+     * @param {Char} if the user is an admin, shows pledges that are awaiting approval
+     *               was originally an integer but now treated as a string after the sending
+     *                   in the GET request
+     * @returns {JSON} returns json of up to 20 pledges, with data for the home screen
+     */
 	async listPledges(offset, showFinished, admin) {
 		// get list of pledges
 		let sql = `SELECT p.title, p.creator, p.deadline, d.moneyRaised, p.moneyTarget, 
@@ -124,11 +183,18 @@ SUM(amount) AS moneyRaised FROM donations GROUP BY pledgeId
 		return data
 	}
 
+	/*
+     * updates a pledges' approved status to true
+     * @param {Integer} id of the pledge
+     */
 	async approvePledge(id) {
 		const sql = `UPDATE pledges SET approved = 1 WHERE id = ${id};`
 		await this.db.run(sql)
 	}
 
+	/* if a pledge is not approved, it is deleted from the database
+     * @param {Integer} id of the pledge
+     */
 	async denyPledge(id) {
 		const sql = `DELETE FROM pledges WHERE id = ${id};`
 		await this.db.run(sql)

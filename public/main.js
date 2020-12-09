@@ -1,14 +1,20 @@
 import { loadCookie, mainEventListeners } from './assets/js/functions.js'
 
-// when page first loads
+/*
+ * loads main event listeners when page finished loading
+ */
 window.addEventListener('DOMContentLoaded', async event => {
 	mainEventListeners()
 	loadCookie('pledgeuser')
 	load(event)
 })
-// every time # changes in url, event triggered
+
 window.addEventListener('hashchange', async event => await load(event))
 
+/*
+ * every time # changes in url, event triggered
+ * loads other html pages into the main of index.html, with js modules
+ */
 async function load() {
 
 	document.querySelector('main').style.display = 'none' // hides main html

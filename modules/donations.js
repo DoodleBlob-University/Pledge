@@ -1,7 +1,15 @@
 const sqlite = require('sqlite-async')
 
+/*
+ * Donations
+ * Module that handles donations that the user makes to a pledge
+ */
 module.exports = class Donations {
 
+	/*
+     * Create donations object
+     * @param {String} [dbName=":memory:"] is the name of the database file being used
+     */
 	constructor(dbName = ':memory:') {
 		// create database table if not yet existing
 		return (async() => {
@@ -18,6 +26,11 @@ FOREIGN KEY(pledgeId) REFERENCES pledges(id));'
 		})()
 	}
 
+	/*
+     * Adds donation to database, throws error on failure
+	 * @param {String} base64 encoded string of payment credentials
+	 * @param {String} the username of the user
+	 */
 	async donate(encodedData, username) {
 
 		const data = Buffer.from(encodedData, 'base64').toString() // decode
@@ -40,6 +53,12 @@ ${amount}, '${username}', ${pledgeid});`
 
 	}
 
+	/*
+     * Processes payment for the donation using users card credentials
+     * Here it just throws an error if the 'Fake Payment Failure' button was pressed by the user
+     * @param {Array} the array of arguments for the function, typically would have users card credentials and amount
+     *                is different due to the extra argument of paymentFailure
+     */
 	async tryPayment(args) {
 		const expectedArgumentLength = 3
 		const expectedFailureArgumentIndex = 2
@@ -55,11 +74,20 @@ ${amount}, '${username}', ${pledgeid});`
 		// do payment magic here
 	}
 
+	/*
+     * Checks if the user form was input correctly
+     * TODO
+     */
 	async donateCheck() {
 		// TODO
 		return true
 	}
 
+	/*
+     * Returns json of donations and their users for a specific pledge
+     * @param {Integer} the id number of the pledge
+     * @returns {JSON} results of the sql query
+     */
 	async getDonations(pledgeId) {
 		const sql = `SELECT user, amount FROM donations WHERE pledgeId = ${pledgeId} ORDER BY id DESC;`
 		const data = await this.db.all(sql)

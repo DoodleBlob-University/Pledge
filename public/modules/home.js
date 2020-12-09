@@ -5,6 +5,10 @@ import http from '../assets/js/httpstatus.js'
 let offset = 0
 let loadedAll = false
 
+/*
+ * called after html contents are loaded into the main of index.html
+ * sets up onclick listeners
+ */
 export function setup() {
 
 	document.getElementById('newpledgebtn').addEventListener('click', () => {
@@ -29,6 +33,7 @@ export function setup() {
 
 }
 
+// if user scrolls down fully, load more content
 window.onscroll = function() {
 	if ( document.getElementById('loading').style.display !== 'block' && !loadedAll ) {
 		// only load more if there is more to load, or not currently loading
@@ -43,6 +48,9 @@ window.onscroll = function() {
 	}
 }
 
+/*
+ * calls async function of asyncGetPledges
+ */
 function getPledges() {
 	try{
 		// this needs to be in a try catch or it doesnt work?!?!
@@ -55,6 +63,9 @@ function getPledges() {
 	}
 }
 
+/*
+ * gets list of pledges from server
+ */
 async function asyncGetPledges() {
 	try {
 		const fin = document.getElementById('fin').checked
@@ -72,6 +83,11 @@ async function asyncGetPledges() {
 	}
 }
 
+/*
+ * checks server response when getting pledges from server, sends to another function to display
+ * @param {Object} object from server providing response information
+ * @param {JSON} json object containing pledge data provided from server
+ */
 async function getPledgesSuccess(response, json) {
 	if( response.status === http.OK ) { // success
 		if( json.data.length === 0 ) {
@@ -86,7 +102,9 @@ async function getPledgesSuccess(response, json) {
 	}
 }
 
-
+/*
+ * for each pledge retrieved, calculates values and calls function to be displayed
+ */
 async function displayPledges(data) {
 	for ( const p of data ) {
 		// prepare pledgeHTML
@@ -108,6 +126,12 @@ async function displayPledges(data) {
 
 }
 
+/*
+ * generates new divs for pledges and creates pledge html elements
+ * @param {JSON} pledge data
+ * @param {Boolean} value of if the pledge has finished e.g. funded / reached deadline
+ * @param {String} string containing html contents for each pledge
+ */
 function createPledgeHTML(p, finished, htmlStr) {
 	// create new divs for pledge
 	const pledgeDiv = document.getElementById('pledges')
@@ -126,12 +150,23 @@ function createPledgeHTML(p, finished, htmlStr) {
 	// pledges awaiting for approval are inserted above
 }
 
+/*
+ * gets pledge url from the image name provided by server when getting pledge
+ * @param {String} the image name
+ * @returns {String} URL of the image
+ */
 function getURLfromImgName(img) {
 	const plg = `${img.substring(0, img.indexOf('-'))}/${img.substring(img.indexOf('-')+1,
 		img.lastIndexOf('.'))}`
 	return `location.href='${window.location.protocol}//${window.location.host}/${plg}'`
 }
 
+/*
+ * sends pledge data, and calculated data to server for it to format html
+ * ! couldnt figure out how to do this clientside >:( !
+ * @param {JSON} json object containing pledge data and calculated values
+ * @returns {String} html string
+ */
 async function makePledgeHTML(j) {
 	// get html from server get request
 	// server uses ejs to insert variables in j into loaded html
@@ -144,6 +179,7 @@ async function makePledgeHTML(j) {
 
 
 async function displayError(error) {
+	loadedAll = true
 	console.log(error)
 }
 

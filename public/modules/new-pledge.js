@@ -1,6 +1,10 @@
 import { getCookie, previewImage } from '../assets/js/functions.js'
 import http from '../assets/js/httpstatus.js'
 
+/*
+ * called after html contents are loaded into the main of index.html
+ * sets up onclick listeners
+ */
 export function setup() {
 	// redirect to login if not yet logged in
 	const loggedin = getCookie('pledgeuser') !== null ? true : false
@@ -17,6 +21,10 @@ export function setup() {
 	document.getElementById('newpledge').addEventListener('submit', async event => await submitPledge(event))
 }
 
+/*
+ * sends pledge creation form data to server
+ * @param {Object} event containing form submission data
+ */
 async function submitPledge(event) {
 	event.preventDefault() // stops standard html form submission
 	document.getElementById('error').style.display = 'none' // hide error message box
@@ -44,6 +52,10 @@ async function submitPledge(event) {
 	}
 }
 
+/*
+ * adds username to the form data
+ * @returns {Object} the form data with the addition of username
+ */
 function getPledgeData() {
 	const formData = new FormData( document.getElementById('newpledge') )
 	try{// adds username to formdata
@@ -54,6 +66,9 @@ function getPledgeData() {
 	return formData
 }
 
+/*
+ * resizes the input box for pledge goal
+ */
 function resizeInput() {
 	const placeholderTextLength = 3
 	this.style.width =

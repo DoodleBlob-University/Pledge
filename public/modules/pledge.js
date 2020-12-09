@@ -7,6 +7,10 @@ import http from '../assets/js/httpstatus.js'
 
 let loggedin
 
+/*
+ * called after html contents are loaded into the main of index.html
+ * sets up onclick listeners
+ */
 window.addEventListener('DOMContentLoaded', async event => {
 	const finishedStatus = false
 	mainEventListeners()
@@ -25,6 +29,9 @@ window.addEventListener('DOMContentLoaded', async event => {
 	})
 })
 
+/*
+ * gets pledge using pathname in url, loads page html content
+ */
 async function load(event, finishedStatus) {
 	try {
 		const unixTitle = window.location.pathname.substring(1).split('/').join('-')
@@ -48,6 +55,9 @@ async function load(event, finishedStatus) {
 	}
 }
 
+/*
+ * displays thank you message to user if the user has just donated
+ */
 function displayThanks() {
 	// display thank you message for donation
 	const prevDonation = parseInt(location.search.substring(1))
@@ -56,6 +66,10 @@ function displayThanks() {
 	window.history.replaceState({}, document.title, window.location.pathname)
 }
 
+/*
+ * displays admin panel and lets admin approve of deny pledges that are awaiting approval
+ * @param {JSON} data of the pledge, retrieved from server
+ */
 async function adminPanel(pledgeData) {
 	// displays admin panel if user is admin and pledge has not been approved
 	if( checkIfAdmin() && pledgeData.approved === 0 ) {
@@ -77,6 +91,10 @@ async function adminPanel(pledgeData) {
 	}
 }
 
+/*
+ * upon approving or denying a pledge successfully, redirects user
+ * @param {Char} id of the button pressed
+ */
 function adminPanelOK(btnid) {
 	// success
 	if( btnid === 'y') {
@@ -86,7 +104,11 @@ function adminPanelOK(btnid) {
 	}
 }
 
-
+/*
+ * gets list of donators from server
+ * @param {Integer} id of pledge
+ * @returns {JSON} json object containing all users who donated to pledge, and the amounts donated
+ */
 async function getDonators(id) {
 	// get array of donators + their amounts
 	const options = { headers: { id: id }}
@@ -96,6 +118,11 @@ async function getDonators(id) {
 	return json.data
 }
 
+/*
+ * loads html content for pledge
+ * @param {JSON} data for the pledge
+ * @param {Boolean} whether the pledge has finished e.g. funded / deadline
+ */
 async function displayPledge(pledgeData, finished) {
 	const donators = await getDonators(pledgeData.id)
 	// load html
@@ -110,6 +137,10 @@ async function displayPledge(pledgeData, finished) {
 	loadFinish(finished, pledgeData.approved)
 }
 
+/*
+ * loads image from filesystem onto html canvas
+ * @param {String} name of the pledge's image
+ */
 function loadImage(imageName) {
 	document.getElementById('canvas')
 	const ctx = document.getElementById('canvas').getContext('2d')
@@ -122,11 +153,20 @@ function loadImage(imageName) {
 	image.src = imageURL
 }
 
+/*
+ * gets deadline and changes html to display days remaining
+ * @param {Integer} unix timestamp for deadline
+ */
 function loadDeadline(deadline) {
 	// load deadline
 	document.getElementById('daysremaining').innerHTML = getDaysRemaining(deadline) | 0
 }
 
+/*
+ * changes html to display money raised and target, calcuates width of progress bar
+ * @param {Integer} money raised to pledge
+ * @param {Integer} target goal for pledge
+ */
 function loadMoney(raised, target) {
 	// load money funded
 	const percentMax = 100
@@ -141,6 +181,10 @@ function loadMoney(raised, target) {
 	}
 }
 
+/*
+ * displays donators on page with the money they pledged
+ * @param {JSON} object containing donators and donation amounts
+ */
 function loadDonators(donators) {
 	const donatorlist = document.getElementById('donatorlist')
 	donators.forEach( (e) => {
@@ -151,6 +195,11 @@ function loadDonators(donators) {
 	} )
 }
 
+/*
+ * checks if pledge is finished and hides donate button
+ * @param {Boolean} if pledge is finished
+ * @param {Boolean} if pledge has been approved by an admin
+ */
 function loadFinish(finished, approved) {
 	// if user pledge is not donateable
 	if( !checkDonateable(finished, approved) ) {
@@ -159,6 +208,11 @@ function loadFinish(finished, approved) {
 	}
 }
 
+/*
+ * if pledge cannot be donated to e.g finished or not yet approved - displays message accordingly
+ * @param {Boolean} if pledge is finished
+ * @param {Boolean} if pledge has been approved by an admin
+ */
 function loadNonDonateable(finished, approved) {
 	if( approved && finished ) {
 		// if pledge has finished

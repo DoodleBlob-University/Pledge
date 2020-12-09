@@ -2,6 +2,10 @@ import { loadCookie, getCookie, mainEventListeners, getPledge,
 	checkPledgeFinished, checkDonateable, encodeData } from '../assets/js/functions.js'
 import http from '../assets/js/httpstatus.js'
 
+/*
+ * once page contents are loaded, loads event listeners and user credential cookie if logged in
+ * @param {Object} page loaded object
+ */
 window.addEventListener('DOMContentLoaded', async event => {
 	mainEventListeners()
 	loadCookie('pledgeuser')
@@ -13,6 +17,10 @@ window.addEventListener('DOMContentLoaded', async event => {
 	document.getElementById('loading').style.display = 'none' // hides loading dots
 })
 
+/*
+ * gets pledge using pathname in url
+ * @returns {JSON} returns all data for the pledge
+ */
 async function load() {
 	try {
 		const unixTitleDonate = window.location.pathname.substring(1).split('/').join('-')
@@ -20,7 +28,7 @@ async function load() {
 		const pledgeData = await getPledge(unixTitle)
 		const finished = await checkPledgeFinished(pledgeData)
 		document.getElementById('urltitle').innerHTML = pledgeData.title
-		await displayDonate(pledgeData)
+		document.getElementById('pledgetitle').innerHTML = pledgeData.title
 
 		if( !checkDonateable(finished, pledgeData.approved) ) {
 			// if not donateable
@@ -37,11 +45,7 @@ async function load() {
 	}
 }
 
-async function displayDonate(pledgeData) {
-	document.getElementById('pledgetitle').innerHTML = pledgeData.title
-}
 
-/* eslint-disable max-statements, max-lines-per-function */
 async function donate(event, pledgeData) {
 	event.preventDefault() // stops standard html form submission
 	document.getElementById('error').style.display = 'none' // hide error message box
@@ -88,5 +92,4 @@ async function donate(event, pledgeData) {
 		document.getElementById('submitfail').disabled = false
 	}
 }
-/* eslint-enable max-statements, max-lines-per-function */
 
