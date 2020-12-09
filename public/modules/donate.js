@@ -45,7 +45,11 @@ async function load() {
 	}
 }
 
-
+/*
+ * prepares donation page for sending to server, disables buttons stopping multiple presses etc
+ * @param {Object} event of form submission
+ * @param {JSON} data of pledge being donated to
+ */
 async function donate(event, pledgeData) {
 	event.preventDefault() // stops standard html form submission
 	document.getElementById('error').style.display = 'none' // hide error message box
@@ -55,33 +59,7 @@ async function donate(event, pledgeData) {
 	const fail = event.submitter.id === 'submitfail' ? true : false // if button invokes failed payment
 	try {
 
-		const form = document.getElementById('donation')
-		const data = Object.fromEntries(new FormData(form).entries())
-
-		// todo check input fields
-
-		// get encoded data
-		const cardCred = encodeData(pledgeData.id, data.amount, data.ccnumber,
-			data.cvc, data.ccname, data.ccexp)
-		const userCred = JSON.parse(getCookie('pledgeuser')).encodedData
-
-		const options = { headers: { cc: cardCred, usr: userCred, fail: fail } }
-		const response = await fetch('/donate', options)
-		const json = await response.json()
-
-		if( response.status === http.OK ) {
-			// success
-			console.log(json)
-			window.location.href = `${window.location.pathname.substring(0,
-            	window.location.pathname.lastIndexOf('/'))}?${data.amount}`
-
-		} else if ( response.status === http.Unauthorized ) {
-			// failure
-			throw json.msg
-		} else {
-			// any unexpected response codes
-			throw `${response.status}: ${json.msg}`
-		}
+		await sendDonation(pledgeData, fail)
 
 	} catch (error) {
 		const errorBox = document.getElementById('error') // display error
@@ -90,6 +68,38 @@ async function donate(event, pledgeData) {
 	} finally {
 		document.getElementById('submit').disabled = false
 		document.getElementById('submitfail').disabled = false
+	}
+}
+
+/*
+ * sends donation to server
+ * @param {JSON} data of pledge being donated to
+ * @param {Boolean} if user clicked the fake payment failure button
+ */
+async function sendDonation(pledgeData, fail) {
+	const form = document.getElementById('donation')
+	const data = Object.fromEntries(new FormData(form).entries())
+
+	// get encoded data
+	const cardCred = encodeData(pledgeData.id, data.amount, data.ccnumber,
+		data.cvc, data.ccname, data.ccexp)
+	const userCred = JSON.parse(getCookie('pledgeuser')).encodedData
+	const options = { headers: { cc: cardCred, usr: userCred, fail: fail } }
+	const response = await fetch('/donate', options)
+	const json = await response.json()
+
+	if( response.status === http.OK ) {
+		// success
+		console.log(json)
+		window.location.href = `${window.location.pathname.substring(0,
+			window.location.pathname.lastIndexOf('/'))}?${data.amount}`
+
+	} else if ( response.status === http.Unauthorized ) {
+		// failure
+		throw json.msg
+	} else {
+		// any unexpected response codes
+		throw `${response.status}: ${json.msg}`
 	}
 }
 
