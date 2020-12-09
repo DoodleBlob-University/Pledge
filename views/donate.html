@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title id="urltitle">. . .</title>
+        <link rel="stylesheet" href="<%= host + '/style.css' %>">
+        <link rel="icon" type="image/png" href="<%= host + '/assets/images/PledgeLogo.png' %>" />
+        <script type="module" src="<%= host + '/modules/donate.js' %>"></script>
+    </head>
+    
+    <body>
+        <header>
+        <div class="nav">
+            <a href="/" style="padding:7px 0px 0px 100px;">
+                <img src="<%= host + '/assets/images/PledgeLogo.png' %>" class="logo">
+            </a>
+            <a href="/">Pledge</a>
+
+            <div class="profilelogin">
+                <div class="dropdown" style="float:right; padding-right:10%;">
+                    <button class="dropbtn" id="dropdownTitle">Log In
+                        <i class="fas fa-camera"></i>
+                    </button>
+                    <div class="dropdown-content" id="dropdown-content">
+                      <a id="loginbtn" href="/#login" style="display:none;">Log In</a>
+                      <a id="registerbtn" href="/#register" style="display:none;">Register</a>
+                      <a id="logoutbtn" href="javascript:;" style="display:none;">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </header>
+        
+        <main style="display:none;">
+            <div class="feed">
+                <div class="content" style="min-width:840px;max-width:840px;margin:15px auto 0;">
+                    <div class="text">
+                        <h1>Donate to <span id=pledgetitle>Pledge</span></h1>
+         
+                        <form class="form" id="donation">
+                            <div id="boxes" class="boxes">
+                                <p>Choose an amount to donate</p>
+                            <span class="money">
+                                <input type="checkbox" class="moneybox" value="10" name="amount">£10
+                            </span>
+                            <span class="money">
+                                <input type="checkbox" class="moneybox" value="20" name="amount">£20
+                            </span>
+                            <span class="money">
+                                <input type="checkbox" class="moneybox" value="50" name="amount">£50
+                            </span>
+                            <span class="money">
+                                <input type="checkbox" class="moneybox" value="100" name="amount">£100
+                            </span>
+                            <span class="money">
+                                <input type="checkbox" class="moneybox" value="200" name="amount">£200
+                            </span>
+                            <span class="money">
+                                <input type="checkbox" class="moneybox" value="500" name="amount">£500
+                            </span>
+                            </div>
+                            <script>
+                                // only allow one checkbox to be checked
+                                document.querySelector("#boxes").onclick = function(ev) {
+                                    let anySelected = false
+                                    document.getElementById("paymentdetails").style.display = "none"
+                                    for( let box of document.getElementsByClassName("moneybox")){
+                                        if( box.value != ev.target.value ){
+                                            box.checked = false
+                                        } else if (box.value === ev.target.value && box.checked === true){
+                                            anySelected = true
+                                        }
+                                    }
+                                    if(anySelected){
+                                        document.getElementById("paymentdetails").style.display = "block"
+                                    }
+                                }
+                            </script>
+                            <div id="paymentdetails" class="paymentdetails" style="display:none">
+                                <input type="text" name="ccnumber" placeholder="Card Number" style="width:17ch;">
+                                <input type="text" name="cvc" placeholder="CVC" style="width:4ch;">
+                                <br>
+                                <input type="text" name="ccname" placeholder="Name on Card" style="width:20ch;">
+                                <input type="text" name="ccexp" placeholder="Expiry" style="width:8ch;">
+                                <br><br>
+                                <span id="error"><div id="errmsg">Error message</div></span>
+                                <button id="submit">Submit Donation</button><br>
+                                <button id="submitfail" style="font-size:10px;background-color:#FF7F7F;">Fake Payment Failure</button>
+                            </div>
+                        </form>
+                        
+                      
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <div id="loading" style="display:block;">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+        
+        <button id="scrolltotop" title="Go to top">⇧</button>
+
+        <footer>
+        </footer>
+    </body>
+ 
+    
+    
+    
+</html>

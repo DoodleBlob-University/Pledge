@@ -1,8 +1,41 @@
 <div class="feed">
     
-  <div class="content">
+  <div class="content" style="min-width:850px;">
       <div class="text">
-          New Pledge
+          <form id="newpledge" class="form">
+              <h1>Create new Pledge</h1>
+              <div class="targetcontainer">
+                  <div class="fundingtitle">Funding Goal</div>
+                  <div class="fundingwrap">
+                      £<input name="fundgoal" type="number" id="fundinggoal" min="10" placeholder="000">
+                  </div>
+              </div>
+              <p>
+                  <input type="text" name="pledgename" placeholder="Pledge Title" style="font-size:30px;font-weight:bold;">
+              </p>
+              <p style="position:relative;">
+                  <canvas id="canvas" width="800" height="250"></canvas>
+                  <br>
+                  <label for="fileinput" class="custom-fileupload">Upload Image</label>
+                  <input id="fileinput" type="file" name="image" accept="image/jpeg, image/png">
+              </p>
+              <p>
+                  <h3>Location</h3>
+                  <br><br>
+              </p>
+              <p>
+                  <h3>Deadline</h3>
+                  <div><input type="date" name="deadline"></div><br>
+              </p>
+              <p>
+                  <h3>Pledge Description</h3>
+                  <textarea id="description" name="desc" cols=="20" rows="6"></textarea><br>
+              </p>
+              <span id="error"><div id="errmsg">Error message</div></span>
+              <p>
+                  <button type="submit">Submit</button>
+              </p>
+          </form>
       </div>
   </div>
     

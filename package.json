@@ -2,24 +2,42 @@
 	"name": "Pledge",
 	"version": "1.0.0",
 	"engines": {
-		"node": "12.14.x"
+		"node": "14.x"
 	},
 	"description": "",
 	"main": "index.js",
+	"ava": {
+		"verbose": true,
+		"require": [
+			"esm"
+		]
+	},
 	"scripts": {
-		"start": "node index.js"
+		"start": "node index.js",
+		"linter": "eslint . --ext .js || true",
+		"flinter": "eslint . --ext .js --fix || true",
+		"test": "ava || true"
 	},
 	"author": "Charles Barry",
 	"dependencies": {
-		"atob": "^2.1.2",
+		"ava": "^3.14.0",
 		"bcrypt": "^5.0.0",
 		"bcrypt-promise": "^2.0.0",
-		"browserify": "^17.0.0",
+		"ejs": "^3.1.5",
+		"fs-extra": "^9.0.1",
 		"koa": "^2.11.0",
 		"koa-body": "^4.1.1",
+		"koa-compose": "^4.1.0",
+		"koa-ejs": "^4.3.0",
 		"koa-router": "^8.0.8",
 		"koa-send": "^5.0.0",
 		"koa-static": "^5.0.0",
+		"mime-types": "^2.1.27",
 		"sqlite-async": "^1.0.12"
+	},
+	"devDependencies": {
+		"ava": "^3.13.0",
+		"babel-eslint": "^8.0.1",
+		"esm": "^3.2.25"
 	}
 }
