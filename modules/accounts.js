@@ -37,7 +37,7 @@ admin BOOLEAN NOT NULL CHECK (admin IN (0,1)));'
 	 */
 	async register(email, username, password) {
 		// check if any fields are empty
-		await this.registerCheck(email, username, password) // TODO: input checking
+		await this.registerCheck(email, username, password)
 
 		// check if username already exists
 		let sql = `SELECT COUNT(id) AS count FROM users WHERE username = '${username}';`
@@ -61,7 +61,7 @@ admin BOOLEAN NOT NULL CHECK (admin IN (0,1)));'
 	}
 
 	/*
-     * checks if the user inputted correct credentials
+     * checks if the user inputted correct credentials for registration
      * if not throws error that alerts the user
 	 * @param {String} the users' email address
 	 * @param {String} the users' username
@@ -69,12 +69,52 @@ admin BOOLEAN NOT NULL CHECK (admin IN (0,1)));'
 	 * @returns {Boolean} returns true if user form input is correct otherwise throws error
 	 */
 	async registerCheck(email, username, password) {
-		/*
-        if( email.length === 0 || username.length === 0 || password.length === 0) {
-            throw new Error('Not all fields are filled')
-        }
-        */
+		await this.checkIfEmpty(email, username, password)
+		await this.checkEmail(email)
+		await this.checkUsername(username)
+		await this.checkPassword(password)
+
 		return true
+	}
+
+	async checkIfEmpty() {
+		const args = Array.from(arguments)
+		try {
+			if( !args.every( x => x !== null && x.trim() !== '' ) ) {
+				throw new Error('One or more fields are empty')
+			}
+		} catch (err) {
+			if( err.message === 'Cannot read property \'trim\' of undefined' ) {
+				throw new Error('Invalid Arguments')
+			} else {
+				throw err
+			}
+		}
+
+	}
+
+	async checkEmail(email) {
+		const re = /\S+@\S+\.\S+/
+		if( !re.test(String(email).toLowerCase() ) ) {
+			throw new Error('E-mail is invalid')
+		}
+	}
+
+	async checkUsername(username) {
+		const maxUsernameLength = 15
+		if( username.length > maxUsernameLength ) {
+			throw new Error(`Username is too long (max ${maxUsernameLength} characters)`)
+		}
+	}
+
+	async checkPassword(password) {
+		const minPasswordLength = 8
+		const maxPasswordLength = 72 // max amount of chars bcrypt can handle
+		if( password.length < minPasswordLength ) {
+			throw new Error(`Password is too short (must be more than ${minPasswordLength} characters)`)
+		} else if ( password.length >= maxPasswordLength ) {
+			throw new Error(`Password is too long (max ${maxPasswordLength} characters)`)
+		}
 	}
 
 	/* checks to see if a set of login credentials are valid
@@ -84,16 +124,30 @@ admin BOOLEAN NOT NULL CHECK (admin IN (0,1)));'
 	async login(encodedData) {
 		const data = Buffer.from(encodedData, 'base64').toString() // decode
 		const [ username, password ] = data.split(':') // split into password and username
+		await this.loginCheck(username, password)
 		// check db for user
 		const sql = `SELECT username, password, admin FROM users WHERE username = '${username}';`
 		const result = await this.db.get(sql)
 		// check if any users exist
-		if(!result) throw new Error(`${username} is not a registered user`)
+		if(!result) throw new Error('Username and/or password do not match')
 		// check if passwords match
-		const match = await bcrypt.compare(password, result.password) // encrypt
-		if(!match) throw new Error('Password is incorrect')
+		const match = await bcrypt.compare(password, result.password) // encrypt and compare
+		if(!match) throw new Error('Username and/or password do not match')
 
 		return { username: username, admin: result.admin }
+	}
+
+	/*
+     * checks if the user inputted valid (but not correct) credentials for login
+     * if not throws error that alerts the user
+	 * @param {String} the users' username
+	 * @param {String} the users' password
+	 * @returns {Boolean} returns true if user form input is correct otherwise throws error
+	 */
+	async loginCheck(username, password) {
+		await this.checkIfEmpty(username, password)
+		// does not check others as not necessary
+		return true
 	}
 
 
