@@ -1,0 +1,26 @@
+<div class="content" onclick="<%- url %>" style="cursor: pointer;" onmouseover="">
+  <div class="text" style="padding-top:5px;">
+      <div class="titlebox" style="">
+          <span class="pledgetitle"><h3 id="pledgetitle" style="display:inline-block;"><%- title %></h3>
+              <span style="font-size:14px;margin-left:10px;"><span id="creator"><%- creator %></span></span>
+          </span>
+          <span style="display:flex;justify-content:center;align-items:center;margin-top:5px;">         
+          
+          <%if (approved !== "1") { %>
+            <div id="notif" class="timeremaining" style="font-size:13px;background-color:yellow;">Awaiting Approval</div>
+          <% } else if (finished === "true") { %>    
+            <div id="notif" class="timeremaining" style="font-size:13px;background-color:#30FFB7">Pledge Finished</div>
+          <% } else { %>
+            <div id="notif" class="timeremaining" style="font-size:13px;">&#128197; <b><span id="daysremaining"><%- ( daysremaining | 0 ) %></span></b> days remaining</div> 
+          <% } %>
+                
+          </span>
+      </div>
+      <div class="progressbar" style="border-radius:5px;height:15px;display:flex;width:100%;margin: 0 auto;">
+          <div id="progressbar" class="progress"
+                style="border-radius:5px;height:15px;font-size:13px;display:block;width:<%- progresswidth %>%;" >
+          </div>
+      </div>
+      <div style="font-size:10px;text-align:center;">£<%- moneyraised %>/<%- moneytarget %></div>
+  </div>
+</div>

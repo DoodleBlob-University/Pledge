@@ -196,7 +196,12 @@ SUM(amount) AS moneyRaised FROM donations GROUP BY pledgeId
      * @param {Integer} id of the pledge
      */
 	async denyPledge(id) {
-		const sql = `DELETE FROM pledges WHERE id = ${id};`
+		// delete image
+		let sql = `SELECT image FROM pledges WHERE id = ${id};`
+		const data = await this.db.get(sql)
+		fs.remove(`public/assets/images/pledges/${data.image}`, err => !err)
+		// delete from db
+		sql = `DELETE FROM pledges WHERE id = ${id};`
 		await this.db.run(sql)
 	}
 

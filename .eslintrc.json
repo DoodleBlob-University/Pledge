@@ -12,8 +12,7 @@
 		"ecmaVersion": 2018,
 		"noInlineConfig": true,
 		"reportUnusedDisableDirectives": true,
-		"sourceType": "module",
-        "allowImportExportEverywhere": true
+		"sourceType": "module"
 	},
 	"rules": {
 		"arrow-body-style": "error",
@@ -67,7 +66,7 @@
 		"yoda": "error"
 	},
 	"overrides": [{
-		"files": [ "test-*.js" ],
+		"files": [ "**/unitTests/** " ],
 		"rules": {
 			"global-require": "off",
 			"max-lines-per-function": "off",
