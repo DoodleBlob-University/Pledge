@@ -29,5 +29,5 @@ async function getHandlebarData(ctx, next) {
 app.use(koaStatic('public'))
 app.use(getHandlebarData)
 
-app.use(router.routes())
+app.use(router)
 module.exports = app.listen(port, () => console.log(`Listening on port: ${port}`))

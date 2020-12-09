@@ -21,7 +21,6 @@ admin BOOLEAN NOT NULL CHECK (admin IN (0,1)));'
 	}
 
 	//REGISTER NEW USER
-	/* eslint-disable complexity, max-lines-per-function */
 	async register(email, username, password) {
 		// check if any fields are empty
 		await this.registerCheck(email, username, password) // TODO: input checking
@@ -46,7 +45,7 @@ admin BOOLEAN NOT NULL CHECK (admin IN (0,1)));'
 		return true
 
 	}
-	/* eslint-enable complexity, max-lines-per-function */
+
 	async registerCheck(email, username, password) {
 		/*
         if( email.length === 0 || username.length === 0 || password.length === 0) {

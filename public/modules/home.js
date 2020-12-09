@@ -1,4 +1,6 @@
-import { getCookie } from '../assets/js/functions.js'
+import { getCookie, getDaysRemaining, getProgressBarSize,
+	checkIfAdmin } from '../assets/js/functions.js'
+import http from '../assets/js/httpstatus.js'
 
 let offset = 0
 let loadedAll = false
@@ -53,45 +55,41 @@ function getPledges() {
 	}
 }
 
-/* eslint-disable max-lines-per-function */
 async function asyncGetPledges() {
 	try {
 		const fin = document.getElementById('fin').checked
-		const admin = (function() { // checks if user is admin
-			try {
-				return JSON.parse(getCookie('pledgeuser')).admin
-			} catch(e) {
-				// user not logged in
-				return 0
-			}
-		})()
+		const admin = checkIfAdmin() ? 1 : 0
 
 		const options = { headers: { fin: fin, off: offset, admin: admin } }
 		const response = await fetch('/list', options)
 		const json = await response.json()
 
-		if( response.status === 200 ) { // success
-			if( json.data.length === 0 ) {
-				loadedAll = true // stop loading more if returning value is none
-			} else {
-				await displayPledges(json.data) // display pledges
-			}
-			document.getElementById('loading').style.display = 'none'
-
-		} else { // failure
-			throw new Error()
-		}
+		await getPledgesSuccess(response, json)
 
 	} catch (error) {
 		loadedAll = true // prevents loading of more
 		await displayError(error)
 	}
 }
-/* eslint-enable max-lines-per-function */
+
+async function getPledgesSuccess(response, json) {
+	if( response.status === http.OK ) { // success
+		if( json.data.length === 0 ) {
+			loadedAll = true // stop loading more if returning value is none
+		} else {
+			await displayPledges(json.data) // display pledges
+		}
+		document.getElementById('loading').style.display = 'none'
+
+	} else { // failure
+		throw new Error()
+	}
+}
 
 
 async function displayPledges(data) {
-	data.forEach( p => {
+	for ( const p of data ) {
+		// prepare pledgeHTML
 		p.moneyRaised = p.moneyRaised === null ? 0 : p.moneyRaised
 
 		const url = getURLfromImgName(p.image)
@@ -100,27 +98,32 @@ async function displayPledges(data) {
 		const finished = daysRemaining <= 0 || p.moneyRaised >= p.moneyTarget ? true : false
 		const approved = p.approved
 
-		const htmlStr = makePledgeHTML({url: url, approved: approved, title: p.title,
+		const htmlStr = await makePledgeHTML({url: url, approved: approved, title: p.title,
 			creator: p.creator, daysRemaining: daysRemaining,
 			moneyRaised: p.moneyRaised, moneyTarget: p.moneyTarget,
 			progressWidth: progressWidth, finished: finished})
+		// display pledge HTML
+		createPledgeHTML(p, finished, htmlStr)
+	}
 
-		const pledgeDiv = document.getElementById('pledges')
-		const mList = document.createElement('div')
-		mList.setAttribute('id', 'mainlist')
-		pledgeDiv.appendChild(mList)
+}
 
-		// set position as beforebegin if not yet approved
-		// set position as beforeend if not finished
-		// set position as afterend if finished
-		const pos = !p.approved ? 'beforebegin' : finished ? 'afterend' : 'beforeend'
+function createPledgeHTML(p, finished, htmlStr) {
+	// create new divs for pledge
+	const pledgeDiv = document.getElementById('pledges')
+	const mList = document.createElement('div')
+	mList.setAttribute('id', 'mainlist')
+	pledgeDiv.appendChild(mList)
 
-		// insert html into created attribute, unless pledge is finished or awiting approval
-		document.getElementById('mainlist').insertAdjacentHTML(pos, htmlStr)
-		// finished pledges are inserted outside the created element, so they appear at the bottom
-		// pledges awaiting for approval are inserted above
-	})
+	// set position as beforebegin if not yet approved
+	// set position as beforeend if not finished
+	// set position as afterend if finished
+	const pos = !p.approved ? 'beforebegin' : finished ? 'afterend' : 'beforeend'
 
+	// insert html into created attribute, unless pledge is finished or awiting approval
+	document.getElementById('mainlist').insertAdjacentHTML(pos, htmlStr)
+	// finished pledges are inserted outside the created element, so they appear at the bottom
+	// pledges awaiting for approval are inserted above
 }
 
 function getURLfromImgName(img) {
@@ -129,47 +132,15 @@ function getURLfromImgName(img) {
 	return `location.href='${window.location.protocol}//${window.location.host}/${plg}'`
 }
 
-function getDaysRemaining(deadline) {
-	const now = new Date().getTime() / 1000 | 0 // seconds, floored
-	return ( deadline - now ) / 60 / 60 / 24 // get days, rounded down
-}
-
-function getProgressBarSize(raised, target) {
-	let percent = raised / target * 100
-	percent = percent > 100 ? 100 : percent
-	return percent
-}
-
-/* eslint-disable max-lines-per-function, max-len */
-function makePledgeHTML(j) {
-	let htmlStr =`
-    <div class="content" onclick="${j.url}" style="cursor: pointer;" onmouseover="">
-      <div class="text" style="padding-top:5px;">
-          <div class="titlebox" style="">
-              <span class="pledgetitle"><h3 id="pledgetitle" style="display:inline-block;">${j.title}</h3>
-                  <span style="font-size:14px;margin-left:10px;"><span id="creator">${j.creator}</span></span></span>
-              <span style="display:flex;justify-content:center;align-items:center;margin-top:5px;">`
-	if( !j.approved ) {
-		htmlStr += '<div id="notif" class="timeremaining" style="font-size:13px;background-color:yellow;">Awaiting Approval</div>'
-	} else if( j.finished ) {
-		htmlStr += '<div id="notif" class="timeremaining" style="font-size:13px;background-color:#30FFB7">Pledge Finished</div>'
-	} else {
-		htmlStr += `<div id="notif" class="timeremaining" style="font-size:13px;">&#128197; <b><span id="daysremaining">${j.daysRemaining | 0}</span></b> days remaining</div>`
-	}
-	htmlStr += `</span>
-          </div>
-          <div class="progressbar" style="border-radius:5px;height:15px;display:flex;width:100%;margin: 0 auto;">
-              <div id="progressbar" class="progress"
-                    style="border-radius:5px;height:15px;font-size:13px;display:block;width:${j.progressWidth}%;" >
-              </div>
-          </div>
-          <div style="font-size:10px;text-align:center;">£${j.moneyRaised}/${j.moneyTarget}</div>
-      </div>
-  </div>
-`
+async function makePledgeHTML(j) {
+	// get html from server get request
+	// server uses ejs to insert variables in j into loaded html
+	const options = { headers: j }
+	const response = await fetch('/pledgehtml', options)
+	const json = await response.json()
+	const htmlStr = json.html
 	return htmlStr
 }
-/* eslint-enable max-lines-per-function, max-len */
 
 
 async function displayError(error) {

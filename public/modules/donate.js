@@ -1,6 +1,6 @@
-//
 import { loadCookie, getCookie, mainEventListeners, getPledge,
 	checkPledgeFinished, checkDonateable, encodeData } from '../assets/js/functions.js'
+import http from '../assets/js/httpstatus.js'
 
 window.addEventListener('DOMContentLoaded', async event => {
 	mainEventListeners()
@@ -65,13 +65,13 @@ async function donate(event, pledgeData) {
 		const response = await fetch('/donate', options)
 		const json = await response.json()
 
-		if( response.status === 200 ) {
+		if( response.status === http.OK ) {
 			// success
 			console.log(json)
 			window.location.href = `${window.location.pathname.substring(0,
             	window.location.pathname.lastIndexOf('/'))}?${data.amount}`
 
-		} else if ( response.status === 401 ) {
+		} else if ( response.status === http.Unauthorized ) {
 			// failure
 			throw json.msg
 		} else {

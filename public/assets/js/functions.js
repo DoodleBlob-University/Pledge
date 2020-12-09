@@ -16,18 +16,56 @@ export function encodeData() {
 	return encode
 }
 
+export function getDaysRemaining(deadline) {
+	const millisecondsInSeconds = 1000
+	const secondsInMinute = 60
+	const minutesInHour = 60
+	const hoursInDay = 24
+
+	const now = new Date().getTime() / millisecondsInSeconds | 0 // seconds, floored
+	return ( deadline - now ) / secondsInMinute / minutesInHour / hoursInDay // get days
+}
+
+export function getProgressBarSize(raised, target) {
+	const percentMax = 100
+	let percent = raised / target * percentMax
+	percent = percent > percentMax ? percentMax : percent
+	return percent
+}
+
+export function checkIfAdmin() {
+	return function() {
+		try{
+			if(JSON.parse(getCookie('pledgeuser')).admin) {
+				return true
+			}
+		}catch(e) {
+			return false
+		}
+		return false
+	}()
+}
+
+
 /* --- Cookies --- */
 // from plainjs.com
 export function createCookie(key, value, days) {
+	const millisecondsInSeconds = 1000
+	const secondsInMinute = 60
+	const minutesInHour = 60
+	const hoursInDay = 24
+
 	const expire = new Date() //cookie expiration
-	expire.setTime(expire.getTime() + 1000*60*60*24*days) // milliseconds, minutes, hours, days
+	expire.setTime(expire.getTime() +
+       millisecondsInSeconds*secondsInMinute*minutesInHour*hoursInDay*days)
 	// format cookie string
 	document.cookie = `${key}=${value};path=/;expires=${expire.toGMTString()}`
 }
 
 export function getCookie(name) {
+	const cookieContentIndex = 2
 	const v = document.cookie.match(`(^|;) ?${name}=([^;]*)(;|$)`)
-	return v ? v[2] : null
+	return v ? v[ cookieContentIndex ] : null
 }
 
 export function deleteCookie(name) {
@@ -58,12 +96,13 @@ export function previewImage(input) {
 
 //https://stackoverflow.com/a/23105310
 export function drawImageScaled(img, ctx) {
+	const divideHalf = 2
 	const canvas = ctx.canvas
 	const hRatio = canvas.width / img.width
 	const vRatio = canvas.height / img.height
 	const ratio = Math.min( hRatio, vRatio )
-	const centerShiftX = ( canvas.width - img.width*ratio ) / 2
-	const centerShiftY = ( canvas.height - img.height*ratio ) / 2
+	const centerShiftX = ( canvas.width - img.width*ratio ) / divideHalf
+	const centerShiftY = ( canvas.height - img.height*ratio ) / divideHalf
 	ctx.clearRect(0,0,canvas.width, canvas.height)
 	ctx.drawImage(img, 0,0, img.width, img.height,
 		centerShiftX,centerShiftY,img.width*ratio, img.height*ratio)
@@ -100,7 +139,8 @@ export function mainEventListeners() {
 
 	/* --- scroll to top button --- */
 	window.addEventListener('scroll', () => {
-		if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+		const scrollDepth = 20
+		if (document.body.scrollTop > scrollDepth || document.documentElement.scrollTop > scrollDepth) {
 			document.getElementById('scrolltotop').style.display = 'block'
 		} else {
 			document.getElementById('scrolltotop').style.display = 'none'
@@ -119,19 +159,21 @@ export function emptyFields(object) {
 }
 
 /* --- Pledges --- */
+import http from './httpstatus.js'
 
 export async function getPledge(unixTitle) {
 	const options = { headers: { unixTitle: unixTitle } }
 	const response = await fetch('/pledge', options)
 	const json = await response.json()
 
-	if( response.status !== 200 ) throw json.msg // if not successful throw error
+	if( response.status !== http.OK ) throw json.msg // if not successful throw error
 	return json.data // return json
 }
 
 export async function checkPledgeFinished(pledgeData) {
+	const millisecondsInSeconds = 1000
 	if( pledgeData.moneyRaised >= pledgeData.moneyTarget ||
-      ( new Date().getTime() / 1000 | 0 ) >= pledgeData.deadline ) {
+      ( new Date().getTime() / millisecondsInSeconds | 0 ) >= pledgeData.deadline ) {
 		return 'Pledge Finished'
 	}
 	return false

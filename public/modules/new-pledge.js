@@ -1,4 +1,5 @@
 import { getCookie, previewImage } from '../assets/js/functions.js'
+import http from '../assets/js/httpstatus.js'
 
 export function setup() {
 	// redirect to login if not yet logged in
@@ -16,30 +17,21 @@ export function setup() {
 	document.getElementById('newpledge').addEventListener('submit', async event => await submitPledge(event))
 }
 
-/* eslint-disable complexity, max-lines-per-function */
 async function submitPledge(event) {
 	event.preventDefault() // stops standard html form submission
 	document.getElementById('error').style.display = 'none' // hide error message box
 	try {
-		const formData = new FormData( document.getElementById('newpledge') )
-		try{// adds username to formdata
-			formData.append('creator', JSON.parse(getCookie('pledgeuser')).username)
-		} catch (notloggedin) {
-			throw 'Please re-login'
-		}
+		const formData = getPledgeData()
 		// post form data
 		const options = { header: 'multipart/form-data', method: 'post', body: formData }
 		const response = await fetch('/pledge', options)
 		const json = await response.json()
 
-		if( response.status === 201 ) {
+		if( response.status === http.Created ) {
 			// success
 			window.alert(json.msg) //alert user that pledge was created
 			window.location.href = json.url
 
-		}else if( response.status === 422) {
-			// error in creating account
-			throw json.msg // throw error message
 		}else{
 			//unknown error
 			throw `${response.status}: ${json.msg}`
@@ -51,9 +43,19 @@ async function submitPledge(event) {
 		errorBox.firstChild.innerHTML = error // change text of inner div
 	}
 }
-/* eslint-enable complexity, max-lines-per-function */
 
+function getPledgeData() {
+	const formData = new FormData( document.getElementById('newpledge') )
+	try{// adds username to formdata
+		formData.append('creator', JSON.parse(getCookie('pledgeuser')).username)
+	} catch (notloggedin) {
+		throw 'Please re-login'
+	}
+	return formData
+}
 
 function resizeInput() {
-	this.style.width = this.value.length > 0 ? `${+ this.value.length }ch` : `${this.value.length + 3 }ch`
+	const placeholderTextLength = 3
+	this.style.width =
+        this.value.length > 0 ? `${+ this.value.length }ch` : `${this.value.length + placeholderTextLength }ch`
 }

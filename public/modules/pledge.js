@@ -1,6 +1,9 @@
-//
 import { getCookie, loadCookie, mainEventListeners, drawImageScaled,
-	getPledge, checkPledgeFinished, checkDonateable } from '../assets/js/functions.js'
+	getPledge, checkPledgeFinished, checkDonateable, getDaysRemaining,
+	getProgressBarSize, checkIfAdmin
+} from '../assets/js/functions.js'
+
+import http from '../assets/js/httpstatus.js'
 
 let loggedin
 
@@ -30,41 +33,11 @@ async function load(event, finishedStatus) {
 		document.getElementById('urltitle').innerHTML = pledgeData.title
 		await displayPledge(pledgeData, finishedStatus)
 
-		// display thank you message for donation
+		// display optional divs
 		if( location.search ) {
-			const prevDonation = parseInt(location.search.substring(1))
-			document.getElementById('donationamount').innerHTML = `£${prevDonation}`
-			document.getElementById('thanks').style.display = 'block'
-			window.history.replaceState({}, document.title, window.location.pathname)
+			displayThanks()
 		}
-
-		// displays admin panel if user is admin and pledge has not been approved
-		if( loggedin && JSON.parse(getCookie('pledgeuser')).admin && pledgeData.approved === 0 ) {
-			document.getElementById('adminpanel').style.display='block'
-			//set up listeners for admin panel buttons
-			document.querySelectorAll('#adminpanel button').forEach(btn =>
-				btn.onclick = async() => {
-					const cred = JSON.parse(getCookie('pledgeuser')).encodedData
-					// send details to server
-					const options = { headers: { id: pledgeData.id, status: btn.id, usr: cred }}
-					const response = await fetch('/approval', options)
-					const json = await response.json()
-					if ( response.status === 200 ) {
-						// success
-						if( btn.id === 'y') {
-							window.location.reload()
-						} else {
-                           	window.location=document.referrer // go to previous page
-						}
-					} else if ( response.status === 401 ) {
-						// user is not an admin
-						console.log( json )
-					} else {
-						console.log( json )
-					}
-
-				})
-		}
+		await adminPanel(pledgeData)
 
 		document.querySelector('main').style.display = 'block' // shows main html
 		document.getElementById('loading').style.display = 'none' // hides loading dots
@@ -75,44 +48,100 @@ async function load(event, finishedStatus) {
 	}
 }
 
+function displayThanks() {
+	// display thank you message for donation
+	const prevDonation = parseInt(location.search.substring(1))
+	document.getElementById('donationamount').innerHTML = `£${prevDonation}`
+	document.getElementById('thanks').style.display = 'block'
+	window.history.replaceState({}, document.title, window.location.pathname)
+}
+
+async function adminPanel(pledgeData) {
+	// displays admin panel if user is admin and pledge has not been approved
+	if( checkIfAdmin() && pledgeData.approved === 0 ) {
+		document.getElementById('adminpanel').style.display='block'
+		//set up listeners for admin panel buttons
+		document.querySelectorAll('#adminpanel button').forEach(btn =>
+			btn.onclick = async() => {
+				const cred = JSON.parse(getCookie('pledgeuser')).encodedData
+				// send details to server
+				const options = { headers: { id: pledgeData.id, status: btn.id, usr: cred }}
+				const response = await fetch('/approval', options)
+				const json = await response.json()
+				if ( response.status === http.OK ) {
+					adminPanelOK(btn.id)
+				} else {
+					console.log( json )
+				}
+			})
+	}
+}
+
+function adminPanelOK(btnid) {
+	// success
+	if( btnid === 'y') {
+		window.location.reload()
+	} else {
+		window.location=document.referrer // go to previous page
+	}
+}
+
+
 async function getDonators(id) {
 	// get array of donators + their amounts
 	const options = { headers: { id: id }}
 	const response = await fetch('/donations', options)
 	const json = await response.json()
-	if ( response.status !== 200 ) throw json.msg
+	if ( response.status !== http.OK ) throw json.msg
 	return json.data
 }
 
-/* eslint-disable max-statements, complexity, max-lines-per-function */
 async function displayPledge(pledgeData, finished) {
+	const donators = await getDonators(pledgeData.id)
+	// load html
 	document.getElementById('pledgetitle').innerHTML = pledgeData.title
-	// load creator
 	document.getElementById('creator').innerHTML = pledgeData.creator
-	// load image
+	document.getElementById('description').innerHTML = pledgeData.description
+	// load images and calculated items
+	loadImage(pledgeData.image)
+	loadDeadline(pledgeData.deadline)
+	loadMoney(pledgeData.moneyRaised, pledgeData.moneyTarget)
+	loadDonators(donators)
+	loadFinish(finished, pledgeData.approved)
+}
+
+function loadImage(imageName) {
 	document.getElementById('canvas')
 	const ctx = document.getElementById('canvas').getContext('2d')
 	const image = new Image()
 	image.onload = function() {
 		drawImageScaled(image, ctx)
 	}
-	const output = `${window.location.protocol}//${window.location.host}/assets/images/pledges/${pledgeData.image}`
-	image.src = output
+	// form image url
+	const imageURL = `${window.location.protocol}//${window.location.host}/assets/images/pledges/${imageName}`
+	image.src = imageURL
+}
+
+function loadDeadline(deadline) {
 	// load deadline
-	const now = new Date().getTime() / 1000 | 0
-	document.getElementById('daysremaining').innerHTML = ( pledgeData.deadline - now ) / 60 / 60 / 24 | 0
+	document.getElementById('daysremaining').innerHTML = getDaysRemaining(deadline) | 0
+}
+
+function loadMoney(raised, target) {
 	// load money funded
-	document.getElementById('raised').innerHTML = pledgeData.moneyRaised !== null ? pledgeData.moneyRaised : 0
-	document.getElementById('goal').innerHTML = pledgeData.moneyTarget
+	const percentMax = 100
+
+	document.getElementById('raised').innerHTML = raised !== null ? raised : 0
+	document.getElementById('goal').innerHTML = target
 	const progress = document.getElementById('progressbar')
-	let percent = pledgeData.moneyRaised / pledgeData.moneyTarget * 100
-	percent = percent > 100 ? 100 : percent
+	const percent = getProgressBarSize(raised, target)
 	progress.style.width = `${percent}%`
-	if( finished ) {
+	if( percent === percentMax ) { // if bar is full, round right corner
 		progress.style.borderBottomRightRadius = '10px'
 	}
-	// TODO: donators
-	const donators = await getDonators(pledgeData.id)
+}
+
+function loadDonators(donators) {
 	const donatorlist = document.getElementById('donatorlist')
 	donators.forEach( (e) => {
 		const user = e.user
@@ -120,27 +149,25 @@ async function displayPledge(pledgeData, finished) {
 		donatorlist.insertAdjacentHTML('beforeend',
 			`<li><div class="inner"><b>${user}</b> pledged <b>£${amount}</b></div></li>`)
 	} )
+}
 
-	// load description
-	document.getElementById('description').innerHTML = pledgeData.description
-
-	//check finished status
+function loadFinish(finished, approved) {
 	// if user pledge is not donateable
-	if( !checkDonateable(finished, pledgeData.approved) ) {
-		// displays pledge is finished
-
-		if( loggedin && JSON.parse(getCookie('pledgeuser')).admin ) { // do not change if admin
-		} else if( pledgeData.approved === 0 && !finished ) {
-			// if pledge not approved
-			document.getElementById('notif').innerHTML = 'Awaiting Admin Approval'
-			document.getElementById('notif').style.backgroundColor = 'yellow'
-		} else {
-			// if pledge has finished
-			document.getElementById('notif').innerHTML = 'This Pledge has finished'
-			document.getElementById('notif').style.backgroundColor = '#30FFb7'
-		}
+	if( !checkDonateable(finished, approved) ) {
+		loadNonDonateable(finished, approved)
 		document.getElementById('donatebtn').style.display = 'none'
 	}
 }
-/* eslint-enable max-statements, complexity, max-lines-per-function */
 
+function loadNonDonateable(finished, approved) {
+	if( approved && finished ) {
+		// if pledge has finished
+		document.getElementById('notif').innerHTML = 'This Pledge has finished'
+		document.getElementById('notif').style.backgroundColor = '#30FFb7'
+
+	} else if ( !approved && !checkIfAdmin() ) {
+		// if pledge not approved and user not admin
+		document.getElementById('notif').innerHTML = 'Awaiting Admin Approval'
+		document.getElementById('notif').style.backgroundColor = 'yellow'
+	}
+}

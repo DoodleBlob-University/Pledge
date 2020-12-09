@@ -27,30 +27,21 @@ FOREIGN KEY(creator) REFERENCES users(username));'
 	}
 
 	//CREATE NEW PLEDGE
-	/* eslint-disable complexity, max-lines-per-function */
 	async newpledge(body, image) {
 		let imagename
 		try {
-			// TODO: error checking
-			await this.pledgeCheck(body, image) // TODO: input checking
-			const long = null
-			const lat = null
-			const unixDeadline = new Date(body.deadline).getTime() / 1000
+			await this.pledgeCheck(body, image)
+			const [ long, lat ] = [ null, null ]
+			const millisecondsInSeconds = 1000
+			const unixDeadline = new Date(body.deadline).getTime() / millisecondsInSeconds
 
 			imagename = await this.imageSetup(body, image) // upload img and make path
 
 			// add to database
-			const sql = `INSERT INTO pledges(title, image, moneyTarget, deadline,
-description, longitude, latitude, creator, approved) VALUES (
-'${body.pledgename}', '${imagename}', ${body.fundgoal}, ${unixDeadline}, '${body.desc}',
-${long}, ${lat}, '${body.creator}', 0);`
+			const sql = await this.createNewPledgeSQL(body, imagename, unixDeadline, long, lat)
 			await this.db.run(sql)
 
-			// returns url for pledge
-			const unix = imagename.substr(0,imagename.indexOf('-'))
-			const imgname = imagename.substr(imagename.indexOf('-')+1)
-			const name = imgname.substr(0, imgname.lastIndexOf('.'))
-			return `${unix}/${name}`
+			return await this.createPledgeURL(imagename)
 
 		} catch (error) {
 			if(imagename) { // remove image from filesystem (if possible)
@@ -61,7 +52,22 @@ ${long}, ${lat}, '${body.creator}', 0);`
 			throw error
 		}
 	}
-	/* eslint-enable complexity, max-lines-per-function */
+
+	async createNewPledgeSQL(body, img, unix, long, lat) {
+		const sql = `INSERT INTO pledges(title, image, moneyTarget, deadline,
+description, longitude, latitude, creator, approved) VALUES (
+'${body.pledgename}', '${img}', ${body.fundgoal}, ${unix}, '${body.desc}',
+${long}, ${lat}, '${body.creator}', 0);`
+		return sql
+	}
+
+	async createPledgeURL(imagename) {
+		// returns url for pledge
+		const unix = imagename.substr(0,imagename.indexOf('-'))
+		const imgname = imagename.substr(imagename.indexOf('-')+1)
+		const name = imgname.substr(0, imgname.lastIndexOf('.'))
+		return `${unix}/${name}`
+	}
 
 	async imageSetup(body, image) {
 		// upload image to filesystem
@@ -107,11 +113,12 @@ SUM(amount) AS moneyRaised FROM donations GROUP BY pledgeId
 			if( showFinished === 'false' ) sql += ' AND'
 		}
 
+		const numOfPledges = 20
 		if( showFinished === 'false' ) {
 			// do not display finished listings
 			sql += ' deadline > strftime(\'%s\', \'now\') AND ( moneyRaised < moneyTarget OR moneyRaised IS NULL)'
 		}
-		sql += ` ORDER BY deadline LIMIT 20 OFFSET ${20*offset};`
+		sql += ` ORDER BY deadline LIMIT ${numOfPledges} OFFSET ${numOfPledges*offset};`
 
 		const data = await this.db.all(sql)
 		return data

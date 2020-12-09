@@ -30,7 +30,7 @@ async function load() {
 	} catch(err) {
 		// page doesnt exist
 		console.log(err)
-		window.location.href = '/#404'
+		//window.location.href = '/#404'
 	}
 
 	document.querySelector('main').style.display = 'block' // displays upon page loading

@@ -18,8 +18,6 @@ FOREIGN KEY(pledgeId) REFERENCES pledges(id));'
 		})()
 	}
 
-
-	/* eslint-disable no-unused-vars */
 	async donate(encodedData, username) {
 
 		const data = Buffer.from(encodedData, 'base64').toString() // decode
@@ -41,16 +39,16 @@ ${amount}, '${username}', ${pledgeid});`
 		}
 
 	}
-	/* eslint-enable no-unused-vars */
-
 
 	async tryPayment(args) {
+		const expectedArgumentLength = 3
+		const expectedFailureArgumentIndex = 2
 		/* This is where card payment would occur */
 		// accepts x inputs as in real use, fakepaymentbutton would not be an argument
 		args = Array.from(args)
-		if( args.length === 3 ) {
+		if( args.length === expectedArgumentLength ) {
 			// fakes payment failure if fake payment button was clicked
-			if( args[2] === 'true' ) {
+			if( args[ expectedFailureArgumentIndex ] === 'true' ) {
 				throw new Error('Payment Failed<br>Try another payment method or wait to try again')
 			}
 		}

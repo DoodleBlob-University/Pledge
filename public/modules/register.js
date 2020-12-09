@@ -1,4 +1,5 @@
 import { emptyFields } from '../assets/js/functions.js'
+import http from '../assets/js/httpstatus.js'
 
 export function setup() {
 	// wait for form submission, then run login()
@@ -9,7 +10,6 @@ export function setup() {
 }
 
 
-/* eslint-disable complexity, max-lines-per-function */
 async function register(event) {
 	event.preventDefault() // stops standard html form submission
 	document.getElementById('error').style.display = 'none' // hide error message box
@@ -20,22 +20,7 @@ async function register(event) {
 		if( emptyFields(data) ) throw 'Not all fields are filled'
 		if( data.password !== data.passwordconf) throw 'Passwords do not match'
 
-		// post register data
-		const options = { method: 'post', body: JSON.stringify(data) }
-		const response = await fetch('/register', options)
-		const json = await response.json()
-
-		if( response.status === 422) {
-			// error in creating the account
-			throw json.msg // throw error message
-		} else if (response.status === 201) {
-			// user registered successfully
-			window.alert(json.msg) //alert user account was created
-			window.location.href = '/#login' // redirect to login
-
-		} else {
-			throw `${response.status}: ${json.msg}`
-		}
+		await postRegister(data)
 
 	} catch (error) {
 		const errorBox = document.getElementById('error') // display error
@@ -43,7 +28,25 @@ async function register(event) {
 		errorBox.firstChild.innerHTML = error // change text of inner div
 	}
 }
-/* eslint-enable complexity, max-lines-per-function */
+
+async function postRegister(data) {
+	// post register data
+	const options = { method: 'post', body: JSON.stringify(data) }
+	const response = await fetch('/register', options)
+	const json = await response.json()
+
+	if( response.status === http.Unprocessable ) {
+		// error in creating the account
+		throw json.msg // throw error message
+	} else if (response.status === http.Created ) {
+		// user registered successfully
+		window.alert(json.msg) //alert user account was created
+		window.location.href = '/#login' // redirect to login
+
+	} else {
+		throw `${response.status}: ${json.msg}`
+	}
+}
 
 
 async function passConfCheck() {
