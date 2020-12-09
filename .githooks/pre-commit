@@ -1,0 +1,42 @@
+#!/bin/bash
+
+#set -e # abort script if error
+
+branch=`git rev-parse --abbrev-ref HEAD`
+
+# check if code is nice
+(npm run linter >/dev/null 2>&1)
+if [[ "$?" == "1" ]]; then
+    printf "Linter detected errors in code.\nAborting.\n"
+    exit 1
+fi
+
+# check if unit tests pass
+(npm test >/dev/null 2>&1)
+if [[ "$?" == "1" ]]; then
+    printf "One or more unit tests failed.\nAborting.\n"
+    exit 1
+fi
+
+# check if branch is master
+if [[ "$branch" == "master" ]]; then
+    if [[ $2 == "merge" ]]; then
+        # user is merging
+        echo "  You are trying to merge with the 'master' branch"
+    else
+        # user is committing directly to master
+        echo "  You are committing directly to the 'master' branch"
+    fi
+    # get user input
+    read -n 1 -p "  Are you sure you want to do this? [Y/n] `echo $'\n  > '`" yn
+    case $yn in
+        [Yy]* ) 
+            printf "\n"
+            exit 0 # continue with commit
+        ;;
+        * ) 
+            printf "\nAborting.\n" 
+            exit 1
+        ;;
+    esac
+fi

@@ -19,7 +19,7 @@ test('NEW-PLEDGE : create new pledge', async t => {
 	try {
 		//await plg.newpledge(body, image)
 
-		t.pass('no errors')
+		t.pass('test')
 	} catch (error) {
 		t.fail(error)
 	}

@@ -14,9 +14,9 @@
 	},
 	"scripts": {
 		"start": "node index.js",
-		"linter": "eslint . --ext .js || true",
-		"flinter": "eslint . --ext .js --fix || true",
-		"test": "ava || true"
+		"linter": "eslint . --ext .js",
+		"flinter": "eslint . --ext .js --fix",
+		"test": "ava"
 	},
 	"author": "Charles Barry",
 	"dependencies": {
