@@ -153,7 +153,7 @@ test('REGISTER : email invalid', async t => {
 		await acc.register(invalidEmail, 'username', 'password')
 		t.fail('error not thrown')
 	} catch (err) {
-		t.is(err.message, `E-mail is invalid`, 'wrong error thrown')
+		t.is(err.message, 'E-mail is invalid', 'wrong error thrown')
 	} finally {
 		acc.close()
 	}
