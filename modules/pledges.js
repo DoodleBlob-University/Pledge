@@ -18,21 +18,29 @@ module.exports = class Pledges {
 		return (async() => {
 			this.path = dbName
 			this.db = await sqlite.open(dbName)
-			this.db.get('PRAGMA foreign_keys = ON') // enforce foreign keys
-			const sql = 'CREATE TABLE IF NOT EXISTS pledges(\
-id INTEGER PRIMARY KEY AUTOINCREMENT,title VARCHAR(60) NOT NULL,\
-image BLOB NOT NULL,\
-moneyTarget INTEGER NOT NULL,\
-deadline INTEGER NOT NULL,\
-description VARCHAR(600) NOT NULL,\
-longitude INTEGER,\
-latitude INTEGER,\
-creator VARCHAR(30) NOT NULL,\
-approved BOOLEAN NOT NULL CHECK (approved IN (0,1)),\
-FOREIGN KEY(creator) REFERENCES users(username));'
+			this.db.get('PRAGMA foreign_keys = ON;') // enforce foreign keys
+			const sql = `CREATE TABLE IF NOT EXISTS pledges(
+id INTEGER PRIMARY KEY AUTOINCREMENT,title VARCHAR(60) NOT NULL,
+image BLOB NOT NULL UNIQUE,moneyTarget INTEGER NOT NULL,
+deadline INTEGER NOT NULL,description VARCHAR(600) NOT NULL,
+longitude INTEGER,latitude INTEGER,
+creator VARCHAR(30) NOT NULL,approved BOOLEAN NOT NULL CHECK (approved IN (0,1)),
+FOREIGN KEY(creator) REFERENCES users(username) ON DELETE CASCADE);`
 			await this.db.run(sql)
+			await this.constructDonationsTable() // also construct donations table
 			return this
 		})()
+	}
+
+	async constructDonationsTable() {
+		const sql = `CREATE TABLE IF NOT EXISTS donations(
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+amount INTEGER NOT NULL,
+user VARCHAR(30) NOT NULL,
+pledgeId INTEGER NOT NULL,
+FOREIGN KEY(user) REFERENCES users(username),
+FOREIGN KEY(pledgeId) REFERENCES pledges(id) ON DELETE CASCADE );`
+		await this.db.run(sql)
 	}
 
 	/*
@@ -63,13 +71,11 @@ FOREIGN KEY(creator) REFERENCES users(username));'
 	}
 
 	async handleCreationErrors(error, imagename) {
-		if ( error.message.includes('SQLITE_ERROR') ) {
-			error.message = 'Database error. One or more inputted fields do not exist.'
+		if ( error.message === 'SQLITE_CONSTRAINT: FOREIGN KEY constraint failed' ) {
+			throw new Error('FOREIGN KEY ERROR: One or more inputted fields do not exist.')
 		}
 		if(imagename) { // remove image from filesystem (if possible)
-			fs.remove(`public/assets/images/pledges/${imagename}`, err => {
-				throw err
-			})
+			fs.remove(`public/assets/images/pledges/${imagename}`)
 		}
 		throw error
 	}
@@ -88,6 +94,7 @@ FOREIGN KEY(creator) REFERENCES users(username));'
 description, longitude, latitude, creator, approved) VALUES (
 '${body.pledgename}', '${img}', ${body.fundgoal}, ${unix}, '${body.desc}',
 ${long}, ${lat}, '${body.creator}', 0);`
+		console.log(sql)
 		return sql
 	}
 
@@ -125,8 +132,30 @@ ${long}, ${lat}, '${body.creator}', 0);`
 	 * @returns {Boolean} returns true if user form input is correct otherwise throws error
 	 */
 	async pledgeCheck(body, image) {
-		// TODO
+		await this.checkValidJSON(body)
+		await this.checkMoneyTarget(body.fundgoal)
 		return true
+	}
+
+	async checkValidJSON(body) {
+		for (const key in body) {
+			if (!body.hasOwnProperty(key)) {
+				throw new Error('Invalid JSON')
+			} else {
+				if( !body[key] ) {
+					throw new Error('One or more fields are empty')
+				}
+			}
+		}
+	}
+
+	async checkMoneyTarget(target) {
+		const targetFloat = parseFloat(target)
+		if( target && target < 50 ) {
+			throw new Error('Funding Goal needs to be greater than £50')
+		} else if ( targetFloat !== parseInt(target) ) {
+			throw new Error('Funding Goal must be an integer with no decimal places')
+		}
 	}
 
 	/*

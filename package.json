@@ -31,13 +31,14 @@
 		"koa-router": "^8.0.8",
 		"koa-send": "^5.0.0",
 		"koa-static": "^5.0.0",
-		"mime-types": "^2.1.27",
-		"sqlite-async": "^1.0.12"
+		"mime-types": "^2.1.27"
 	},
 	"devDependencies": {
 		"ava": "^3.14.0",
 		"babel-eslint": "^8.0.1",
 		"esm": "^3.2.25",
-		"rewire": "^5.0.0"
+		"rewire": "^5.0.0",
+		"sqlite-async": "^1.1.1",
+		"sqlite3": "^5.0.0"
 	}
 }

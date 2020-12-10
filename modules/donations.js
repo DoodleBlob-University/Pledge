@@ -10,19 +10,12 @@ module.exports = class Donations {
      * Create donations object
      * @param {String} [dbName=":memory:"] is the name of the database file being used
      */
-	constructor(dbName = ':memory:') {
+	constructor(dbName = ':memory:', test) {
 		// create database table if not yet existing
 		return (async() => {
 			this.db = await sqlite.open(dbName)
 			this.db.get('PRAGMA foreign_keys = ON') // enforce foreign keys
-			const sql = 'CREATE TABLE IF NOT EXISTS donations(\
-id INTEGER PRIMARY KEY AUTOINCREMENT,\
-amount INTEGER NOT NULL,\
-user VARCHAR(30) NOT NULL,\
-pledgeId INTEGER NOT NULL,\
-FOREIGN KEY(user) REFERENCES users(username),\
-FOREIGN KEY(pledgeId) REFERENCES pledges(id));'
-			await this.db.run(sql)
+
 			return this
 		})()
 	}
@@ -93,6 +86,10 @@ ${amount}, '${username}', ${pledgeid});`
 		const sql = `SELECT user, amount FROM donations WHERE pledgeId = ${pledgeId} ORDER BY id DESC;`
 		const data = await this.db.all(sql)
 		return data
+	}
+
+	async close() {
+		await this.db.close()
 	}
 
 }
