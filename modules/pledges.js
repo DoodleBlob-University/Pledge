@@ -16,10 +16,11 @@ module.exports = class Pledges {
 	constructor(dbName = ':memory:') {
 		// create database if not yet existing
 		return (async() => {
+			this.path = dbName
 			this.db = await sqlite.open(dbName)
+			this.db.get('PRAGMA foreign_keys = ON') // enforce foreign keys
 			const sql = 'CREATE TABLE IF NOT EXISTS pledges(\
-id INTEGER PRIMARY KEY AUTOINCREMENT,\
-title VARCHAR(60) NOT NULL,\
+id INTEGER PRIMARY KEY AUTOINCREMENT,title VARCHAR(60) NOT NULL,\
 image BLOB NOT NULL,\
 moneyTarget INTEGER NOT NULL,\
 deadline INTEGER NOT NULL,\
@@ -57,13 +58,20 @@ FOREIGN KEY(creator) REFERENCES users(username));'
 			return await this.createPledgeURL(imagename)
 
 		} catch (error) {
-			if(imagename) { // remove image from filesystem (if possible)
-				fs.remove(`public/assets/images/pledges/${imagename}`, err => {
-					throw `${error}\n\n${err}`
-				})
-			}
-			throw error
+			await this.handleCreationErrors(error, imagename)
 		}
+	}
+
+	async handleCreationErrors(error, imagename) {
+		if ( error.message.includes('SQLITE_ERROR') ) {
+			error.message = 'Database error. One or more inputted fields do not exist.'
+		}
+		if(imagename) { // remove image from filesystem (if possible)
+			fs.remove(`public/assets/images/pledges/${imagename}`, err => {
+				throw err
+			})
+		}
+		throw error
 	}
 
 	/*

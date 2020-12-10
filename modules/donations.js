@@ -14,6 +14,7 @@ module.exports = class Donations {
 		// create database table if not yet existing
 		return (async() => {
 			this.db = await sqlite.open(dbName)
+			this.db.get('PRAGMA foreign_keys = ON') // enforce foreign keys
 			const sql = 'CREATE TABLE IF NOT EXISTS donations(\
 id INTEGER PRIMARY KEY AUTOINCREMENT,\
 amount INTEGER NOT NULL,\

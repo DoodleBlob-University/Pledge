@@ -1,8 +1,18 @@
 import test from 'ava'
-import fs from 'fs-extra'
+import rewire from 'rewire'
 
 import Accounts from '../modules/accounts.js'
-import Pledges from '../modules/pledges.js'
+const Pledges = rewire('../modules/pledges')
+// mock filesystem behaviour in pledges.js
+const fsStub = {
+	copy: function(path, callback) {
+		return 'copy called'
+	},
+	remove: function(path, callback) {
+		return 'remove called'
+	}
+}
+Pledges.__set__('fs', fsStub)
 
 test('NEW-PLEDGE : create new pledge', async t => {
 	t.plan(1)
@@ -11,17 +21,24 @@ test('NEW-PLEDGE : create new pledge', async t => {
 		pledgename: 'Test Pledge',
 		fundgoal: 100,
 		desc: 'This is a test.',
-		creator: 'testuser'
+		creator: 'testuser',
+		deadline: 987654321
 	}
-	//const image =
 	//
 	const plg = await new Pledges()
+	const acc = await new Accounts()
+    // sqlitedb appears in different memory addresses ^ cant see
 	try {
-		//await plg.newpledge(body, image)
+		//create user
+		//await acc.register( 'test@test.com', body.creator, 'password' )
+		//await plg.newpledge(body, 'imagename.jpeg')
+		// check values
 
-		t.pass('test')
-	} catch (error) {
-		t.fail(error)
+		//const pledgeData
+
+        t.pass()
+	} catch (err) {
+		throw err
 	}
 })
 
