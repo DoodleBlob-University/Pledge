@@ -1,4 +1,4 @@
-import { getCookie, getDaysRemaining, getProgressBarSize,
+import { getCookie, /*getDaysRemaining,*/ getProgressBarSize,
 	checkIfAdmin } from '../assets/js/functions.js'
 import http from '../assets/js/httpstatus.js'
 
@@ -113,7 +113,8 @@ async function displayPledges(data) {
 		const url = getURLfromImgName(p.image)
 		const img = getURLforImage(p.image)
 		console.log(img)
-		const daysRemaining = getDaysRemaining(p.deadline)
+		//const daysRemaining = getDaysRemaining(p.deadline)
+		const daysRemaining = convertDate(p.deadline)
 		const progressWidth = getProgressBarSize(p.moneyRaised, p.moneyTarget)
 		const finished = daysRemaining <= 0 || p.moneyRaised >= p.moneyTarget ? true : false
 		const approved = p.approved
@@ -187,6 +188,21 @@ async function makePledgeHTML(j) {
 async function displayError(error) {
 	loadedAll = true
 	console.log(error)
+}
+
+//https://stackoverflow.com/a/13459946
+function convertDate(inputFormat) {
+	const millisecondsInSeconds = 1000
+	function pad(s) {
+		const i = 10
+		return s < i ? `0${ s}` : s
+	}
+	const d = new Date(inputFormat *millisecondsInSeconds)
+	console.log(d)
+	console.log( [pad(d.getDate()), pad(d.getMonth()+1), d.getFullYear()].join('/')
+	)
+	return [pad(d.getDate()), pad(d.getMonth()+1), d.getFullYear()].join('/')
+
 }
 
 
