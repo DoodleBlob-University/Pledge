@@ -1,6 +1,5 @@
 import test from 'ava'
 import rewire from 'rewire'
-import fs from 'fs-extra'
 
 import Accounts from '../modules/accounts.js'
 const Pledges = rewire('../modules/pledges')
@@ -17,7 +16,7 @@ Pledges.__set__('fs', fsStub)
 
 const dbPath = 'unitTests/test-database.db'
 //https://stackoverflow.com/a/17371288
-fs.truncate(dbPath, 0, function(){console.log('done')})
+//fs.truncate(dbPath, 0, function(){console.log('done')})
 
 test('NEW-PLEDGE : create new pledge', async t => {
 	t.plan(1)

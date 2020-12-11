@@ -111,6 +111,8 @@ async function displayPledges(data) {
 		p.moneyRaised = p.moneyRaised === null ? 0 : p.moneyRaised
 
 		const url = getURLfromImgName(p.image)
+		const img = getURLforImage(p.image)
+		console.log(img)
 		const daysRemaining = getDaysRemaining(p.deadline)
 		const progressWidth = getProgressBarSize(p.moneyRaised, p.moneyTarget)
 		const finished = daysRemaining <= 0 || p.moneyRaised >= p.moneyTarget ? true : false
@@ -119,7 +121,7 @@ async function displayPledges(data) {
 		const htmlStr = await makePledgeHTML({url: url, approved: approved, title: p.title,
 			creator: p.creator, daysRemaining: daysRemaining,
 			moneyRaised: p.moneyRaised, moneyTarget: p.moneyTarget,
-			progressWidth: progressWidth, finished: finished})
+			progressWidth: progressWidth, finished: finished, img: img})
 		// display pledge HTML
 		createPledgeHTML(p, finished, htmlStr)
 	}
@@ -159,6 +161,10 @@ function getURLfromImgName(img) {
 	const plg = `${img.substring(0, img.indexOf('-'))}/${img.substring(img.indexOf('-')+1,
 		img.lastIndexOf('.'))}`
 	return `location.href='${window.location.protocol}//${window.location.host}/${plg}'`
+}
+
+function getURLforImage(img) {
+	return `${window.location.protocol}//${window.location.host}/assets/images/pledges/${img}`
 }
 
 /*

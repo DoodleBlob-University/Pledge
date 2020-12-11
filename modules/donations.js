@@ -11,11 +11,11 @@ module.exports = class Donations {
      * Create donations object
      * @param {String} [dbName=":memory:"] is the name of the database file being used
      */
-	constructor(dbName = ':memory:', test) {
+	constructor(dbName = ':memory:') {
 		// create database table if not yet existing
 		return (async() => {
 			this.db = await sqlite.open(dbName)
-			this.db.get('PRAGMA foreign_keys = ON') // enforce foreign keys
+			//this.db.get('PRAGMA foreign_keys = ON') // enforce foreign keys
 			const sql = `CREATE TABLE IF NOT EXISTS donations(
 id INTEGER PRIMARY KEY AUTOINCREMENT,
 amount INTEGER NOT NULL,
@@ -37,6 +37,8 @@ FOREIGN KEY(pledgeId) REFERENCES pledges(id) ON DELETE CASCADE );`
 
 		const data = Buffer.from(encodedData, 'base64').toString() // decode
 		const [ pledgeid, amount, ccnumber, cvc, ccname, ccexp ] = data.split(':')
+		await this.donateCheck(pledgeid, amount, {
+			num: ccnumber, cvc: cvc, name: ccname, exp: ccexp})
 		// add donation to database
 		const sql = `INSERT INTO donations(amount, user, pledgeId) VALUES (\
 ${amount}, '${username}', ${pledgeid});`
@@ -77,12 +79,73 @@ ${amount}, '${username}', ${pledgeid});`
 	}
 
 	/*
-     * Checks if the user form was input correctly
-     * TODO
+     * throws error is any of the user inputs are invalid
+     * @param {Integer} amount of money being donated
+     * @param {Integer} credit card number
+     * @param {Integer} cvc
+     * @param {String} name on card
+     * @param {String} expiry date on card
      */
-	async donateCheck() {
-		// TODO
-		return true
+	async donateCheck(pledgeid, amount, card) {
+		if( !pledgeid ) {
+			throw new Error('Field(s) cannot be empty/null')
+		}
+		await this.checkAmount(amount)
+		await this.checkCCNumber(card.num)
+		await this.checkCVC(card.cvc)
+		await this.checkCCName(card.name)
+		await this.checkCCExp(card.exp)
+	}
+
+	async checkAmount(amount) {
+		const gbp10 = 10
+		const gbp20 = 20
+		const gbp50 = 50
+		const gbp100 = 100
+		const gbp200 = 200
+		const gbp500 = 500
+		const acceptedAmounts = [ gbp10, gbp20, gbp50, gbp100, gbp200, gbp500 ]
+		/* //todo
+		var accepted = false
+		for ( const key in acceptedAmounts ) {
+			if( acceptedAmounts[key] === amount) accepted = true
+		}
+		if(!accepted) throw new Error('Amount is not an accepted value.')
+        */
+		return acceptedAmounts, amount
+	}
+
+	async checkCCNumber(ccnumber) {
+		const cardNoLength = 16
+		if( !ccnumber.toString() ) {
+			throw new Error('Field(s) cannot be empty/null')
+		} else if( ccnumber.toString().length !== cardNoLength ) {
+			throw new Error('Card number must be 16 digits')
+		}
+	}
+
+	async checkCVC(cvc) {
+		const cvcLength = 3
+		if( !cvc.toString() ) {
+			throw new Error('Field(s) cannot be empty/null')
+		} else if( cvc.toString().length !== cvcLength ) {
+			throw new Error('CVC must be 3 digits')
+		}
+	}
+
+	async checkCCName(ccname) {
+		if( !ccname ) {
+			throw new Error('Field(s) cannot be empty/null')
+		}
+	}
+
+	async checkCCExp(ccexp) {
+		const expLength = 7
+		if( !ccexp ) {
+			throw new Error('Field(s) cannot be empty/null')
+		} else if( ccexp.length !== expLength ) {
+			throw new Error('Expiry invalid: MM/YYYY')
+		}
 	}
 
 	/*

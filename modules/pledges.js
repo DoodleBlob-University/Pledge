@@ -87,7 +87,6 @@ FOREIGN KEY(creator) REFERENCES users(username) ON DELETE CASCADE);`
 description, longitude, latitude, creator, approved) VALUES (
 '${body.pledgename}', '${img}', ${body.fundgoal}, ${unix}, '${body.desc}',
 ${long}, ${lat}, '${body.creator}', 0);`
-		console.log(sql)
 		return sql
 	}
 

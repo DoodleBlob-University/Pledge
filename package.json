@@ -16,7 +16,7 @@
 		"start": "node index.js",
 		"linter": "eslint . --ext .js",
 		"flinter": "eslint . --ext .js --fix",
-		"test": "ava"
+		"test": "> unitTests/test-database.db | ava"
 	},
 	"author": "Charles Barry",
 	"dependencies": {
@@ -37,8 +37,6 @@
 		"ava": "^3.14.0",
 		"babel-eslint": "^8.0.1",
 		"esm": "^3.2.25",
-		"rewire": "^5.0.0",
-		"sqlite-async": "^1.1.1",
-		"sqlite3": "^5.0.0"
+		"rewire": "^5.0.0"
 	}
 }
