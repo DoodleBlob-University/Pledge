@@ -1,5 +1,6 @@
 const sqlite = require('sqlite-async')
 
+
 /*
  * Donations
  * Module that handles donations that the user makes to a pledge
@@ -15,7 +16,14 @@ module.exports = class Donations {
 		return (async() => {
 			this.db = await sqlite.open(dbName)
 			this.db.get('PRAGMA foreign_keys = ON') // enforce foreign keys
-
+			const sql = `CREATE TABLE IF NOT EXISTS donations(
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+amount INTEGER NOT NULL,
+user VARCHAR(30) NOT NULL,
+pledgeId INTEGER NOT NULL,
+FOREIGN KEY(user) REFERENCES users(username),
+FOREIGN KEY(pledgeId) REFERENCES pledges(id) ON DELETE CASCADE );`
+			await this.db.run(sql)
 			return this
 		})()
 	}

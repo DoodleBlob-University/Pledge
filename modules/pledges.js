@@ -3,6 +3,8 @@ const sqlite = require('sqlite-async')
 const mime = require('mime-types')
 const fs = require('fs-extra')
 
+const Donation = require('./donations')
+
 /*
  * Pledges
  * Module handles the creation, viewing and approval of a pledge
@@ -18,29 +20,17 @@ module.exports = class Pledges {
 		return (async() => {
 			this.path = dbName
 			this.db = await sqlite.open(dbName)
-			this.db.get('PRAGMA foreign_keys = ON;') // enforce foreign keys
+			//this.db.get('PRAGMA foreign_keys = ON;') // enforce foreign keys
 			const sql = `CREATE TABLE IF NOT EXISTS pledges(
-id INTEGER PRIMARY KEY AUTOINCREMENT,title VARCHAR(60) NOT NULL,
-image BLOB NOT NULL UNIQUE,moneyTarget INTEGER NOT NULL,
-deadline INTEGER NOT NULL,description VARCHAR(600) NOT NULL,
-longitude INTEGER,latitude INTEGER,
-creator VARCHAR(30) NOT NULL,approved BOOLEAN NOT NULL CHECK (approved IN (0,1)),
+id INTEGER PRIMARY KEY AUTOINCREMENT,title VARCHAR(60) NOT NULL,image BLOB NOT NULL UNIQUE,
+moneyTarget INTEGER NOT NULL,deadline INTEGER NOT NULL,description VARCHAR(600) NOT NULL,
+longitude INTEGER,latitude INTEGER,creator VARCHAR(30) NOT NULL,
+approved BOOLEAN NOT NULL CHECK (approved IN (0,1)),
 FOREIGN KEY(creator) REFERENCES users(username) ON DELETE CASCADE);`
 			await this.db.run(sql)
-			await this.constructDonationsTable() // also construct donations table
+			await new Donation(dbName) // also construct donations table
 			return this
 		})()
-	}
-
-	async constructDonationsTable() {
-		const sql = `CREATE TABLE IF NOT EXISTS donations(
-id INTEGER PRIMARY KEY AUTOINCREMENT,
-amount INTEGER NOT NULL,
-user VARCHAR(30) NOT NULL,
-pledgeId INTEGER NOT NULL,
-FOREIGN KEY(user) REFERENCES users(username),
-FOREIGN KEY(pledgeId) REFERENCES pledges(id) ON DELETE CASCADE );`
-		await this.db.run(sql)
 	}
 
 	/*
@@ -66,13 +56,16 @@ FOREIGN KEY(pledgeId) REFERENCES pledges(id) ON DELETE CASCADE );`
 			return await this.createPledgeURL(imagename)
 
 		} catch (error) {
-			await this.handleCreationErrors(error, imagename)
+			await this.handleCreationErrors(error, body, imagename)
 		}
 	}
 
-	async handleCreationErrors(error, imagename) {
+	async handleCreationErrors(error, body, imagename) {
 		if ( error.message === 'SQLITE_CONSTRAINT: FOREIGN KEY constraint failed' ) {
-			throw new Error('FOREIGN KEY ERROR: One or more inputted fields do not exist.')
+			//throw new Error(`'${body.creator}' is not registered`)
+
+			throw new Error(error)
+
 		}
 		if(imagename) { // remove image from filesystem (if possible)
 			fs.remove(`public/assets/images/pledges/${imagename}`)
@@ -132,8 +125,12 @@ ${long}, ${lat}, '${body.creator}', 0);`
 	 * @returns {Boolean} returns true if user form input is correct otherwise throws error
 	 */
 	async pledgeCheck(body, image) {
+		if(!image) {
+			throw new Error('Image not recieved')
+		}
 		await this.checkValidJSON(body)
 		await this.checkMoneyTarget(body.fundgoal)
+		await this.checkDeadline(body.deadline)
 		return true
 	}
 
@@ -151,10 +148,21 @@ ${long}, ${lat}, '${body.creator}', 0);`
 
 	async checkMoneyTarget(target) {
 		const targetFloat = parseFloat(target)
-		if( target && target < 50 ) {
+		const mintarget = 50
+		if( target && target < mintarget ) {
 			throw new Error('Funding Goal needs to be greater than £50')
 		} else if ( targetFloat !== parseInt(target) ) {
 			throw new Error('Funding Goal must be an integer with no decimal places')
+		}
+	}
+
+	async checkDeadline(deadline) {
+		const hoursinday = 24
+		const minimumDaysFromNow = 7
+		const dateNow = new Date()
+		dateNow.setHours( dateNow.getHours() + hoursinday * minimumDaysFromNow -1)
+		if( dateNow.getTime() > deadline ) {
+			throw new Error('Deadline must be set over a week in the future')
 		}
 	}
 
@@ -226,7 +234,10 @@ SUM(amount) AS moneyRaised FROM donations GROUP BY pledgeId
      */
 	async approvePledge(id) {
 		const sql = `UPDATE pledges SET approved = 1 WHERE id = ${id};`
-		await this.db.run(sql)
+		const val = await this.db.run(sql)
+		if(val.lastID === 0) {
+			throw new Error(`pledge with id: ${id} was not found`)
+		}
 	}
 
 	/* if a pledge is not approved, it is deleted from the database
@@ -234,7 +245,7 @@ SUM(amount) AS moneyRaised FROM donations GROUP BY pledgeId
      */
 	async denyPledge(id) {
 		// delete image
-		let sql = `SELECT image FROM pledges WHERE id = ${id};`
+		let sql = `SELECT image FROM pledges WHERE id = ${id} AND approved = 0;`
 		const data = await this.db.get(sql)
 		fs.remove(`public/assets/images/pledges/${data.image}`, err => !err)
 		// delete from db
