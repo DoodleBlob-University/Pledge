@@ -12,11 +12,11 @@ if [[ "$?" == "1" ]]; then
 fi
 
 # check if unit tests pass
-(npm test >/dev/null 2>&1)
-if [[ "$?" == "1" ]]; then
-    printf "One or more unit tests failed.\nAborting.\n"
-    exit 1
-fi
+#(npm test >/dev/null 2>&1)
+#if [[ "$?" == "1" ]]; then
+#    printf "One or more unit tests failed.\nAborting.\n"
+#    exit 1
+#fi
 
 # check if branch is master
 if [[ "$branch" == "master" ]]; then
@@ -28,7 +28,22 @@ if [[ "$branch" == "master" ]]; then
         echo "  You are committing directly to the 'master' branch"
     fi
     # get user input
-    read -n 1 -p "  Are you sure you want to do this? [Y/n] `echo $'\n  > '`" yn
+    read -n 1 -p "  Are you sure you want to do this? [Y/n]: " yn
+    case $yn in
+        [Yy]* ) 
+            printf "\n"
+            # continue
+        ;;
+        * ) 
+            printf "\nAborting.\n" 
+            exit 1
+        ;;
+    esac
+fi
+
+# ask user to check no fast forwarding
+if [[ $2 == "merge" ]]; then
+    read -n 1 -p "  Have you set merge arguments with --no-ff? [Y/n] `echo $'\n  > '`" yn
     case $yn in
         [Yy]* ) 
             printf "\n"

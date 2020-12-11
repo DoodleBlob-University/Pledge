@@ -11,7 +11,7 @@
           <% } else if (finished === "true") { %>    
             <div id="notif" class="timeremaining" style="font-size:13px;background-color:#30FFB7">Pledge Finished</div>
           <% } else { %>
-            <div id="notif" class="timeremaining" style="font-size:13px;">&#128197; <b><span id="daysremaining"><%- ( daysremaining | 0 ) %></span></b> days remaining</div> 
+            <div id="notif" class="timeremaining" style="font-size:13px;">&#128197; <b><span id="daysremaining"><%- ( daysremaining ) %></span></b></div> 
           <% } %>
                 
           </span>
@@ -22,5 +22,8 @@
           </div>
       </div>
       <div style="font-size:10px;text-align:center;">£<%- moneyraised %>/<%- moneytarget %></div>
-  </div>
+      <p style="text-align: center;">
+      <img src="<%- img %>" height=100>
+      </p>
+    </div>
 </div>

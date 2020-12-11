@@ -206,6 +206,7 @@ async function adminApproval(ctx, plg, admin) {
 	if ( admin ) {
 		const id = ctx.request.headers.id
 		const approved = ctx.request.headers.status === 'y' ? true : false
+
 		if ( approved ) {
 			await plg.approvePledge(id)
 		} else {
@@ -213,7 +214,7 @@ async function adminApproval(ctx, plg, admin) {
 		}
 		// success
 		ctx.status = 200
-		ctx.body = { status: 'error', msg: 'not an admin' }
+		ctx.body = { status: 'ok', msg: 'yes' }
 
 	} else {
 		// user is not admin

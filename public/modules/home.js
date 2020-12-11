@@ -1,4 +1,4 @@
-import { getCookie, getDaysRemaining, getProgressBarSize,
+import { getCookie, /*getDaysRemaining,*/ getProgressBarSize,
 	checkIfAdmin } from '../assets/js/functions.js'
 import http from '../assets/js/httpstatus.js'
 
@@ -111,7 +111,10 @@ async function displayPledges(data) {
 		p.moneyRaised = p.moneyRaised === null ? 0 : p.moneyRaised
 
 		const url = getURLfromImgName(p.image)
-		const daysRemaining = getDaysRemaining(p.deadline)
+		const img = getURLforImage(p.image)
+		console.log(img)
+		//const daysRemaining = getDaysRemaining(p.deadline)
+		const daysRemaining = convertDate(p.deadline)
 		const progressWidth = getProgressBarSize(p.moneyRaised, p.moneyTarget)
 		const finished = daysRemaining <= 0 || p.moneyRaised >= p.moneyTarget ? true : false
 		const approved = p.approved
@@ -119,7 +122,7 @@ async function displayPledges(data) {
 		const htmlStr = await makePledgeHTML({url: url, approved: approved, title: p.title,
 			creator: p.creator, daysRemaining: daysRemaining,
 			moneyRaised: p.moneyRaised, moneyTarget: p.moneyTarget,
-			progressWidth: progressWidth, finished: finished})
+			progressWidth: progressWidth, finished: finished, img: img})
 		// display pledge HTML
 		createPledgeHTML(p, finished, htmlStr)
 	}
@@ -161,6 +164,10 @@ function getURLfromImgName(img) {
 	return `location.href='${window.location.protocol}//${window.location.host}/${plg}'`
 }
 
+function getURLforImage(img) {
+	return `${window.location.protocol}//${window.location.host}/assets/images/pledges/${img}`
+}
+
 /*
  * sends pledge data, and calculated data to server for it to format html
  * ! couldnt figure out how to do this clientside >:( !
@@ -181,6 +188,21 @@ async function makePledgeHTML(j) {
 async function displayError(error) {
 	loadedAll = true
 	console.log(error)
+}
+
+//https://stackoverflow.com/a/13459946
+function convertDate(inputFormat) {
+	const millisecondsInSeconds = 1000
+	function pad(s) {
+		const i = 10
+		return s < i ? `0${ s}` : s
+	}
+	const d = new Date(inputFormat *millisecondsInSeconds)
+	console.log(d)
+	console.log( [pad(d.getDate()), pad(d.getMonth()+1), d.getFullYear()].join('/')
+	)
+	return [pad(d.getDate()), pad(d.getMonth()+1), d.getFullYear()].join('/')
+
 }
 
 
